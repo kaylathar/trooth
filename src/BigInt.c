@@ -24,7 +24,7 @@ TR_BigInt* TR_BigInt_fromString(const char* str)
 {
 	const char* cur = str;
 	int i = 0;
-	TR_BigInt *number = TR_bigint_alloc();
+	TR_BigInt *number = TR_BigInt_alloc();
 
 	number->negative = 0;
 	if (*cur == '-')
@@ -46,7 +46,7 @@ TR_BigInt* TR_BigInt_fromString(const char* str)
 const char* TR_BigInt_toString(TR_BigInt *number)
 {
 	int size = number->size;
-	char* buf,origin;
+	char *buf,*origin;
 	int i = 0;
 
 	if (number->negative)
@@ -69,13 +69,13 @@ const char* TR_BigInt_toString(TR_BigInt *number)
 	return origin;
 }
 
-TR_BigInt* TR_BigInt_Add(TR_BigInt *operand1, TR_BigInt *operand2)
+TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 {
 	int i,j,k,size;
 	TR_BigInt* result = TR_BigInt_alloc();
 	char subtract = operand1->negative ^ operand2->negative;
 	char digit1,digit2,carry;
-	size = (MAX(operand1->size,opertand2->size)+1);
+	size = (MAX(operand1->size,operand2->size)+1);
 
 	char* bytes = malloc(sizeof(char)*size);
 	k = size-1;
@@ -86,11 +86,11 @@ TR_BigInt* TR_BigInt_Add(TR_BigInt *operand1, TR_BigInt *operand2)
 		return NULL;
 	}
 
-	for (i=operand1->size,j=operand2->size,carry=0;i >= 0 || j >= 0 || carry > 0)
+	for (i=operand1->size,j=operand2->size,carry=0;i >= 0 || j >= 0 || carry > 0;)
 	{
 		digit1 = i>=0?operand1->bytes[i--]:0;
 		digit2 = j>=0?operand2->bytes[j--]:0;
-		carry += digit1-digit2:digit1+digit2;
+		carry += digit1+digit2;
 		bytes[k--] = carry % 10;
 		carry /= 10;			
 	}
