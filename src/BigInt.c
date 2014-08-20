@@ -12,11 +12,17 @@ struct TR_BigInt
 
 TR_BigInt* TR_BigInt_alloc()
 {
-	return malloc(sizeof(TR_BigInt));
+	TR_BigInt* result = malloc(sizeof(TR_BigInt));
+	result->size = 0;
+	result->bytes = NULL;
 }
 
 void TR_BigInt_free(TR_BigInt *number)
 {
+	if (number->bytes != NULL)
+	{
+		free(number->bytes);
+	}
 	free(number);
 }
 
@@ -97,6 +103,7 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 
 	result->negative = operand1->negative && operand2->negative;
 	result->bytes = malloc(sizeof(char)*(k==0?size-1:size));
+	result->size = k==0?size-1:size;
 	memcpy(result->bytes,k==0?bytes+1:bytes,k==0?size-1:size);
 	free(bytes);
 
