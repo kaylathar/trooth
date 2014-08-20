@@ -92,7 +92,7 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 		return NULL;
 	}
 
-	for (i=operand1->size,j=operand2->size,carry=0;i >= 0 || j >= 0 || carry > 0;)
+	for (i=operand1->size-1,j=operand2->size-1,carry=0;i >= 0 || j >= 0 || carry > 0;)
 	{
 		digit1 = i>=0?operand1->bytes[i--]:0;
 		digit2 = j>=0?operand2->bytes[j--]:0;
@@ -101,10 +101,13 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 		carry /= 10;			
 	}
 
+	if (k==0)
+		size-=1;
+
 	result->negative = operand1->negative && operand2->negative;
-	result->bytes = malloc(sizeof(char)*(k==0?size-1:size));
-	result->size = k==0?size-1:size;
-	memcpy(result->bytes,k==0?bytes+1:bytes,k==0?size-1:size);
+	result->bytes = malloc(sizeof(char)*size);
+	result->size = size;
+	memcpy(result->bytes,k==0?bytes+1:bytes,size);
 	free(bytes);
 
 	return result;

@@ -13,6 +13,5 @@ int main()
 	TR_BigInt_free(k1);
 	TR_BigInt_free(k2);
 	TR_BigInt_free(k3);
-
 	return 0;
 }
