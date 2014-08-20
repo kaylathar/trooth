@@ -15,6 +15,7 @@ TR_BigInt* TR_BigInt_alloc()
 	TR_BigInt* result = malloc(sizeof(TR_BigInt));
 	result->size = 0;
 	result->bytes = NULL;
+	result->negative = 0;
 }
 
 void TR_BigInt_free(TR_BigInt *number)
@@ -24,6 +25,17 @@ void TR_BigInt_free(TR_BigInt *number)
 		free(number->bytes);
 	}
 	free(number);
+}
+
+TR_BigInt* TR_BigInt_copy(TR_BigInt *toCopy)
+{
+	TR_BigInt* result = TR_BigInt_alloc();
+	result->negative = toCopy->negative; 
+	result->size = toCopy->size;
+	result->bytes = malloc(sizeof(char)*result->size);
+	memcpy(result->bytes,toCopy->bytes,toCopy->size);
+
+	return result;
 }
 
 TR_BigInt* TR_BigInt_fromString(const char* str)
@@ -73,6 +85,15 @@ const char* TR_BigInt_toString(TR_BigInt *number)
 	}
 
 	return origin;
+}
+
+TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
+{
+	TR_BigInt* tmp = TR_BigInt_copy(operand2);
+	tmp->negative = !tmp->negative;
+	TR_BigInt* result = TR_BigInt_add(operand1,tmp);
+	TR_BigInt_free(tmp);
+	return result;
 }
 
 TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
