@@ -125,8 +125,72 @@ char TR_BigInt_compare(TR_BigInt *operand1, TR_BigInt *operand2)
 	return 0;
 }
 
+char TR_BigInt_greaterThan(TR_BigInt *operand1,TR_BigInt *operand2)
+{
+	return TR_BigInt_compare(operand1,operand2)==1;
+}
+
+char TR_BigInt_lessThan(TR_BigInt *operand1,TR_BigInt *operand2)
+{
+	return TR_BigInt_compare(operand1,operand2)==-1;
+}
+
+char TR_BigInt_equal(TR_BigInt *operand1,TR_BigInt *operand2)
+{
+	return TR_BigInt_compare(operand1,operand2)==0;
+}
+
 TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 {
+	int i,j,k,size;
+	TR_BigInt* tmp;
+	TR_BigInt* result = TR_BigInt_alloc();
+	char* bytes, digit1,digit2,carry = 0;	
+	
+	switch (TR_BigInt_compare(operand1,operand2))
+	{
+		case 0:
+			bytes = malloc(sizeof(char));
+			bytes[0] = 0;
+			result->bytes = bytes;
+			return result;
+		case 1:
+			break;
+		case -1:
+			tmp = operand1;
+			operand1 = operand2;
+			operand2 = tmp;
+			result->negative = 1;
+	}
+	k = operand1->size-1;
+	bytes = malloc(sizeof(char)*operand1->size);
+
+	for (i = operand1->size-1,k = i,j = operand2->size-1; i >= 0; --i,--j,--k)
+	{
+		digit1 = operand1->bytes[i];
+		digit2 = j >= 0?operand2->bytes[j]:0;
+		if (digit1 < digit2 + carry)
+		{
+			bytes[k] = 10 - (digit2 + carry - digit1);
+			carry = 1;
+		}
+		else
+		{	
+			bytes[k] = digit1 - digit2 - carry;
+			carry = 0;
+		}
+	}
+	for (i = 0; i < operand1->size; ++i)
+	{
+		if (bytes[i] != 0)
+			break;
+	}
+	size = operand1->size - i;
+	result->bytes = malloc(sizeof(char)*size);	
+	memcpy(result->bytes,bytes,size);
+	result->size = size;
+	free(bytes);
+	return result;	
 }
 
 TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
@@ -137,14 +201,6 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 	char digit1,digit2,carry;
 	size = (MAX(operand1->size,operand2->size)+1);
 	char* bytes;
-
-	if (subtract)
-	{
-		if (operand1->negative)
-			return TR_BigInt_subtract(operand2,operand1);
-		
-		return TR_BigInt_subtract(operand1,operand2);
-	}
 
 	bytes = malloc(sizeof(char)*size);
 	k = size-1;
