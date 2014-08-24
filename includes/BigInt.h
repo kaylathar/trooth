@@ -9,3 +9,4 @@ const char* TR_BigInt_toString(TR_BigInt *number);
 TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2);
 TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2);
 TR_BigInt* TR_BigInt_copy(TR_BigInt *toCopy);
+char TR_BigInt_compare(TR_BigInt *operand1, TR_BigInt *operand2);

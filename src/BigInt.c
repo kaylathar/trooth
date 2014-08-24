@@ -2,6 +2,7 @@
 #include "util.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 struct TR_BigInt
 {
@@ -87,13 +88,45 @@ const char* TR_BigInt_toString(TR_BigInt *number)
 	return origin;
 }
 
+char TR_BigInt_compare(TR_BigInt *operand1, TR_BigInt *operand2)
+{
+	int i;
+	char digit1,digit2;
+	if (operand1->negative ^ operand2->negative)
+	{
+		return operand1->negative?-1:1;
+	}
+
+	if (operand1->size > operand2->size)
+	{
+		return operand1->negative?-1:1;
+	}
+
+	if (operand1->size < operand2->size)
+	{
+		return operand2->negative?1:-1;
+	}
+
+	for (i = operand1->size-1; i >= 0; --i)
+	{
+		digit1 = operand1->bytes[i];
+		digit2 = operand2->bytes[i];
+
+		if (digit1 > digit2)
+		{
+			return operand1->negative?-1:1;
+		}
+		if (digit2 < digit2)
+		{
+			return operand2->negative?1:-1;
+		}	
+	}	
+
+	return 0;
+}
+
 TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 {
-	TR_BigInt* tmp = TR_BigInt_copy(operand2);
-	tmp->negative = !tmp->negative;
-	TR_BigInt* result = TR_BigInt_add(operand1,tmp);
-	TR_BigInt_free(tmp);
-	return result;
 }
 
 TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
@@ -103,15 +136,20 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 	char subtract = operand1->negative ^ operand2->negative;
 	char digit1,digit2,carry;
 	size = (MAX(operand1->size,operand2->size)+1);
-
-	char* bytes = malloc(sizeof(char)*size);
-	k = size-1;
+	char* bytes;
 
 	if (subtract)
 	{
-		// TODO: implement subtraction
-		return NULL;
+		if (operand1->negative)
+			return TR_BigInt_subtract(operand2,operand1);
+		
+		return TR_BigInt_subtract(operand1,operand2);
 	}
+
+	bytes = malloc(sizeof(char)*size);
+	k = size-1;
+
+	
 
 	for (i=operand1->size-1,j=operand2->size-1,carry=0;i >= 0 || j >= 0 || carry > 0;)
 	{
@@ -125,7 +163,7 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 	if (k==0)
 		size-=1;
 
-	result->negative = operand1->negative && operand2->negative;
+	result->negative = (operand1->negative && operand2->negative);
 	result->bytes = malloc(sizeof(char)*size);
 	result->size = size;
 	memcpy(result->bytes,k==0?bytes+1:bytes,size);
