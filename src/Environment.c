@@ -3,6 +3,8 @@
 TR_Environment* TR_Environment_alloc()
 {
 	TR_Environment* env =  malloc(sizeof(TR_Environment));
+	env->allocator = &malloc;
+	env->deallocator = &free;
 }
 
 void TR_Environment_free(TR_Environment* env)
