@@ -265,7 +265,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/internal
+AM_CFLAGS = -I$(top_srcdir)/includes -I$(top_srcdir)/internal
 lib_LIBRARIES = libtrooth.a
 libtrooth_a_SOURCES = BigInt.c Environment.c
 all: all-am
