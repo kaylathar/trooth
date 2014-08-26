@@ -227,3 +227,8 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 
 	return result;
 }
+
+
+ 
+
+
