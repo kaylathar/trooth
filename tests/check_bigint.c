@@ -1,5 +1,24 @@
 #include "BigInt.h"
 #include <stdio.h>
+#include <check.h>
+
+START_TEST (bigint_init)
+{
+
+}
+END_TEST
+
+START_TEST (bigint_add)
+{
+
+}
+END_TEST
+
+START_TEST (bigint_subtract)
+{
+
+}
+END_TEST
 
 
 int main()
