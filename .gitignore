@@ -1,0 +1,8 @@
+config/*
+Makefile
+*/Makefile
+autom4te.cache/*
+config.*
+*/.deps/*
+*.o
+*.a
