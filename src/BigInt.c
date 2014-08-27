@@ -157,15 +157,27 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 		case 0:
 			bytes = operand1->environment->allocator(sizeof(char));
 			bytes[0] = 0;
+			result->size = 1;
 			result->bytes = bytes;
 			return result;
 		case 1:
+			result->negative = 0;
 			break;
 		case -1:
+			result->negative = 1;
+			break;
+	}
+
+	switch (operand1->size > operand2->size)
+	{
+
+		case 0:
 			tmp = operand1;
 			operand1 = operand2;
-			operand2 = tmp;
-			result->negative = 1;
+			operand2 = tmp;	
+			break;
+		case 1:
+			break;
 	}
 	k = operand1->size-1;
 	bytes = operand1->environment->allocator(sizeof(char)*operand1->size);

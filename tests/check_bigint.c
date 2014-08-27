@@ -50,15 +50,43 @@ START_TEST (bigint_add)
 	TR_BigInt_free(num2);
 	TR_BigInt_free(num3);
 	TR_BigInt_free(num4);
+        TR_BigInt_free(result1);
+        TR_BigInt_free(result2);
+        TR_BigInt_free(result3);
+        TR_BigInt_free(result4);
 	TR_Environment_free(env);
 }
 END_TEST
 
 START_TEST (bigint_subtract)
 {
-	// Test positive/positive
+	TR_Environment* env = TR_Environment_alloc();
+        TR_BigInt* num1 = TR_BigInt_fromString(env,"1234");
+        TR_BigInt* num2 = TR_BigInt_fromString(env,"-1234");
+        TR_BigInt* num3 = TR_BigInt_fromString(env,"12");
+        TR_BigInt* num4 = TR_BigInt_fromString(env,"-12");
 
-	// Test negative/negative
+        // Test positive/positive
+        TR_BigInt* result1 = TR_BigInt_subtract(num1,num3);
+        TR_BigInt* result2 = TR_BigInt_subtract(num3,num1);
+        ck_assert_str_eq(TR_BigInt_toString(result1),"1222");
+        ck_assert_str_eq(TR_BigInt_toString(result2),"-1222");
+
+        // Test negative/negative
+        TR_BigInt* result3 = TR_BigInt_subtract(num2,num4);
+        TR_BigInt* result4 = TR_BigInt_subtract(num4,num2);
+        ck_assert_str_eq(TR_BigInt_toString(result3),"-1222");
+        ck_assert_str_eq(TR_BigInt_toString(result4),"1222");
+
+        TR_BigInt_free(num1);
+        TR_BigInt_free(num2);
+	TR_BigInt_free(num3);
+	TR_BigInt_free(num4);
+	TR_BigInt_free(result1);
+	TR_BigInt_free(result2);
+	TR_BigInt_free(result3);
+	TR_BigInt_free(result4);
+	TR_Environment_free(env);
 
 }
 END_TEST
