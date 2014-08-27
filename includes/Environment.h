@@ -1,3 +1,6 @@
+#ifndef ENVIRONMENT_H
+#define ENVIRONMENT_H
+
 struct TR_Environment;
 union TR_Data;
 
@@ -6,3 +9,4 @@ typedef union TR_Data TR_Data;
 
 TR_Environment* TR_Environment_alloc();
 void TR_Environment_free(TR_Environment* env);
+#endif

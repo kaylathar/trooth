@@ -1,3 +1,5 @@
+#ifndef ENVIRONMENT_INTERNAL_H
+#define ENVIRONMENT_INTERNAL_H
 #include "Environment.h"
 #include "BigInt.h"
 #include "stdlib.h"
@@ -23,3 +25,5 @@ struct TR_Environment
         TR_Internal_Alloc allocator;
         TR_Internal_Free deallocator;
 };
+
+#endif
