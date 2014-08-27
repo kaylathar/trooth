@@ -93,7 +93,7 @@ const char* TR_BigInt_toString(TR_BigInt *number)
 	return origin;
 }
 
-char TR_BigInt_compare(TR_BigInt *operand1, TR_BigInt *operand2)
+int TR_BigInt_compare(TR_BigInt *operand1, TR_BigInt *operand2)
 {
 	int i;
 	char digit1,digit2;
@@ -132,17 +132,17 @@ char TR_BigInt_compare(TR_BigInt *operand1, TR_BigInt *operand2)
 
 char TR_BigInt_greaterThan(TR_BigInt *operand1,TR_BigInt *operand2)
 {
-	return TR_BigInt_compare(operand1,operand2)==1;
+	return TR_BigInt_compare(operand1,operand2)==1?1:0;
 }
 
 char TR_BigInt_lessThan(TR_BigInt *operand1,TR_BigInt *operand2)
 {
-	return TR_BigInt_compare(operand1,operand2)==-1;
+	return TR_BigInt_compare(operand1,operand2)==-1?1:0;
 }
 
 char TR_BigInt_equal(TR_BigInt *operand1,TR_BigInt *operand2)
 {
-	return TR_BigInt_compare(operand1,operand2)==0;
+	return TR_BigInt_compare(operand1,operand2)==0?1:0;
 }
 
 TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)

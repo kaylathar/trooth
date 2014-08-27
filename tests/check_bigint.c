@@ -94,7 +94,7 @@ END_TEST
 START_TEST (bigint_compare)
 {
 	TR_Environment *env = TR_Environment_alloc();
-	TR_BigInt *num1 = TR_BigInt_fromString(env,"12");
+	TR_BigInt *num1 = TR_BigInt_fromString(env,"-12");
 	TR_BigInt *num2 = TR_BigInt_fromString(env,"12");
 	TR_BigInt *num3 = TR_BigInt_fromString(env,"-1234");
 	TR_BigInt *num4 = TR_BigInt_fromString(env,"1234");
@@ -108,6 +108,20 @@ START_TEST (bigint_compare)
 	ck_assert_int_eq(TR_BigInt_compare(num4,num4),0);
 	ck_assert_int_eq(TR_BigInt_compare(num4,num5),0);
 	ck_assert_int_eq(TR_BigInt_compare(num5,num4),0);
+
+	// Verify convenience functions
+	ck_assert(TR_BigInt_greaterThan(num4,num2)==1);
+	ck_assert(TR_BigInt_greaterThan(num2,num4)==0);
+	ck_assert(TR_BigInt_greaterThan(num1,num3)==1);
+	ck_assert(TR_BigInt_greaterThan(num3,num1)==0);
+	ck_assert(TR_BigInt_greaterThan(num4,num5)==0);
+	ck_assert(TR_BigInt_lessThan(num4,num2)==0);
+	ck_assert(TR_BigInt_lessThan(num2,num4)==1);
+	ck_assert(TR_BigInt_lessThan(num1,num3)==0);
+	ck_assert(TR_BigInt_lessThan(num3,num1)==1);
+	ck_assert(TR_BigInt_lessThan(num4,num5)==0);
+	ck_assert(TR_BigInt_equal(num4,num5)==1);
+	ck_assert(TR_BigInt_equal(num2,num3)==0);
 
 	// Test negative/negative
 	ck_assert_int_eq(TR_BigInt_compare(num1,num3),1);
