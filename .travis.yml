@@ -2,4 +2,5 @@ language: c
 compiler:
   -gcc
   -clang
+before_script: apt-get install make
 script: ./configure && make
