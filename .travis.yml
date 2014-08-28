@@ -1,5 +1,6 @@
 language: c
 compiler:
-  -gcc
-  -clang
-script: ./configure && make
+  - gcc
+  - clang
+before_script: sudo apt-get install check
+script: ./configure && make check
