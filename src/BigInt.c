@@ -245,6 +245,71 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 	return result;
 }
 
+static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
+{
+	int i,j,k;
+	TR_BigInt* result;
+	char* bytes,negative;
+	int carry,realsize;
+
+	negative = operand1->negative ^ operand2->negative;
+	
+	int size = 2*(operand1->size>operand2->size?operand1->size:operand2->size);
+	realsize = size;
+	bytes = operand1->environment->allocator(size*sizeof(char));
+	memset(bytes,0,size*sizeof(char));
+
+
+	for (i = operand1->size-1; i >= 0; --i)
+	{
+		k = (size-1) - ((operand1->size-1) - i);
+		carry = 0;
+		for (j = operand2->size-1; j >= 0 || carry != 0; --j)
+		{
+			if (j >= 0)
+			{
+				carry += (operand1->bytes[i] * operand2->bytes[j]);	
+			}
+			bytes[k] += carry;
+			carry = bytes[k] / 10;
+			bytes[k] = bytes[k] % 10;
+			if (k < realsize)
+			{
+				realsize = k;
+			}
+			--k;	
+		}
+
+	}
+
+	realsize = size - realsize;
+
+	result = TR_BigInt_alloc(operand1->environment);
+	result->negative = negative;
+	result->size = realsize;
+	result->bytes = result->environment->allocator(sizeof(char)*result->size);
+	memcpy(result->bytes,bytes+(size-realsize),realsize);
+	operand1->environment->deallocator(bytes);
+	return result;
+}
+
+static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
+{
+	return NULL;
+}
+
+TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
+{
+
+	// ~ 12 is when Karatsuba's exceeds performance of naive multiplication
+	if (operand1->size > 11 || operand2->size > 11)
+	{
+		return _multiply_karatsuba(operand1,operand2);
+	}
+
+	return _multiply_naive(operand1,operand2);
+}
+
 
  
 

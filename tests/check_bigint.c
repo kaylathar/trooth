@@ -141,6 +141,48 @@ START_TEST (bigint_compare)
 }
 END_TEST
 
+START_TEST(bigint_multiply)
+{
+	TR_Environment *env = TR_Environment_alloc();
+	TR_BigInt *num1 = TR_BigInt_fromString(env,"123");
+	TR_BigInt *num2 = TR_BigInt_fromString(env,"-123");
+	TR_BigInt *num3 = TR_BigInt_fromString(env,"12");
+	TR_BigInt *num4 = TR_BigInt_fromString(env,"-12");
+
+	// pos/pos
+	TR_BigInt *result1 = TR_BigInt_multiply(num3,num1);
+	TR_BigInt *result2 = TR_BigInt_multiply(num1,num3);
+	//ck_assert(TR_BigInt_equal(result1,result2));
+	ck_assert_str_eq(TR_BigInt_toString(result1),"1476");
+	
+
+	// neg/neg
+	TR_BigInt *result3 = TR_BigInt_multiply(num2,num4);
+	TR_BigInt *result4 = TR_BigInt_multiply(num4,num2);
+	//ck_assert(TR_BigInt_equal(result3,result4));
+	ck_assert_str_eq(TR_BigInt_toString(result3),"1476");
+
+	// pos/neg
+	TR_BigInt *result5 = TR_BigInt_multiply(num1,num4);	
+	TR_BigInt *result6 = TR_BigInt_multiply(num4,num1);
+	//ck_assert(TR_BigInt_equal(result5,result6));
+	ck_assert_str_eq(TR_BigInt_toString(result5),"-1476");
+
+
+	TR_BigInt_free(result1);
+	TR_BigInt_free(result2);
+	TR_BigInt_free(result3);
+	TR_BigInt_free(result4);
+	TR_BigInt_free(result5);
+	TR_BigInt_free(result6);
+	TR_BigInt_free(num1);
+	TR_BigInt_free(num2);
+	TR_BigInt_free(num3);
+	TR_BigInt_free(num4);
+	TR_Environment_free(env);
+}
+END_TEST
+
 Suite* bigint_suite()
 {
 	Suite *suite;
@@ -153,6 +195,7 @@ Suite* bigint_suite()
 	tcase_add_test(testCore,bigint_add);
 	tcase_add_test(testCore,bigint_init);
 	tcase_add_test(testCore,bigint_compare);
+	tcase_add_test(testCore,bigint_multiply);
 
 	suite_add_tcase(suite,testCore);
 
