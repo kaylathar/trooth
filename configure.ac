@@ -4,6 +4,8 @@ AC_CONFIG_SRCDIR(src/BigInt.c)
 
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
+
+AM_MAINTAINER_MODE([disable])
 AM_PROG_CC_C_O
 
 AC_PROG_RANLIB
