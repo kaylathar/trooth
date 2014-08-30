@@ -68,6 +68,8 @@ static TR_BigInt* _canonicalize(TR_BigInt* operand)
 	
 }
 
+
+
 /*******************/
 /**Alloc/dealloc****/
 
@@ -452,7 +454,7 @@ TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
 {
 
 	// ~ 12 is when Karatsuba's exceeds performance of naive multiplication
-	//if (operand1->size > 11 || operand2->size > 11)
+	if (operand1->size > 11 || operand2->size > 11)
 	{
 		return _multiply_karatsuba(operand1,operand2);
 	}
