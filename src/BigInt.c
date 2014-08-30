@@ -20,15 +20,17 @@ struct TR_BigInt
 static TR_BigInt* _pad(TR_BigInt* operand, int toSize)
 {
 	// Caution: this returns a non-canonical representation (which is why it is private)
-	TR_BigInt* result = TR_BigInt_alloc(operand->environment);
-	result->size = toSize;
-	result->negative = operand->negative;
-	result->bytes = operand->environment->allocator(toSize);
+	TR_BigInt* result;
 
 	if (operand->size >= toSize)
 	{
 		return operand;
 	}
+	
+	result = TR_BigInt_alloc(operand->environment);
+	result->size = toSize;
+	result->negative = operand->negative;
+	result->bytes = operand->environment->allocator(toSize);
 
 	memset(result->bytes,0,toSize);
 	memcpy(result->bytes+(result->size-operand->size),operand->bytes,operand->size);
@@ -43,6 +45,7 @@ static TR_BigInt* _canonicalize(TR_BigInt* operand)
 	TR_BigInt* result;
 	int i;
 	char *bytes;
+	
 	for (i = 0; i < operand->size; ++i)
         {
                 if (operand->bytes[i] != 0)
@@ -62,6 +65,7 @@ static TR_BigInt* _canonicalize(TR_BigInt* operand)
 	result->bytes = bytes;
 	result->negative = operand->negative;
 	result->size = operand->size-i;
+	operand->environment->dealllocator(bytes);
 	
 	return result;
 
