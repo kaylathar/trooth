@@ -14,6 +14,63 @@ struct TR_BigInt
 	TR_Environment* environment;
 };
 
+
+/*********************/
+/* Utility Functions */
+static TR_BigInt* _pad(TR_BigInt* operand, int toSize)
+{
+	// Caution: this returns a non-canonical representation (which is why it is private)
+	TR_BigInt* result = TR_BigInt_alloc(operand->environment);
+	result->size = toSize;
+	result->negative = operand->negative;
+	result->bytes = operand->environment->allocator(toSize);
+
+	if (operand->size >= toSize)
+	{
+		return operand;
+	}
+
+	memset(result->bytes,0,toSize);
+	memcpy(result->bytes+(result->size-operand->size),operand->bytes,operand->size);
+
+	return result;		
+}
+
+
+static TR_BigInt* _canonicalize(TR_BigInt* operand)
+{
+
+	TR_BigInt* result;
+	int i;
+	char *bytes;
+	for (i = 0; i < operand->size; ++i)
+        {
+                if (operand->bytes[i] != 0)
+                        break;
+        }
+
+
+	if (i == 0)
+	{
+		return operand;
+	}
+
+	result = TR_BigInt_alloc(operand->environment);
+
+	bytes = operand->environment->allocator(operand->size-i);
+	memcpy(bytes,operand->bytes+i,operand->size-i);
+	result->bytes = bytes;
+	result->negative = operand->negative;
+	result->size = operand->size-i;
+	
+	return result;
+
+	
+}
+
+/*******************/
+/**Alloc/dealloc****/
+
 TR_BigInt* TR_BigInt_alloc(TR_Environment* env)
 {
 	TR_BigInt* result = env->allocator(sizeof(TR_BigInt));
@@ -43,6 +100,10 @@ TR_BigInt* TR_BigInt_copy(TR_BigInt *toCopy)
 
 	return result;
 }
+
+
+/*********************/
+/***Input/Output******/
 
 TR_BigInt* TR_BigInt_fromString(TR_Environment* env,const char* str)
 {
@@ -93,6 +154,9 @@ const char* TR_BigInt_toString(TR_BigInt *number)
 
 	return origin;
 }
+
+/**************************/
+/**Comparison/Processing**/
 
 TR_BigInt* TR_BigInt_absolute(TR_BigInt* operand)
 {
@@ -152,6 +216,10 @@ char TR_BigInt_equal(TR_BigInt *operand1,TR_BigInt *operand2)
 {
 	return TR_BigInt_compare(operand1,operand2)==0?1:0;
 }
+
+
+/***************/
+/**Operations**/
 
 TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 {
@@ -293,55 +361,7 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 	return result;
 }
 
-static TR_BigInt* _canonicalize(TR_BigInt* operand)
-{
 
-	TR_BigInt* result;
-	int i;
-	char *bytes;
-	for (i = 0; i < operand->size; ++i)
-        {
-                if (operand->bytes[i] != 0)
-                        break;
-        }
-
-
-	if (i == 0)
-	{
-		return operand;
-	}
-
-	result = TR_BigInt_alloc(operand->environment);
-
-	bytes = operand->environment->allocator(operand->size-i);
-	memcpy(bytes,operand->bytes+i,operand->size-i);
-	result->bytes = bytes;
-	result->negative = operand->negative;
-	result->size = operand->size-i;
-	
-	return result;
-
-	
-}
-
-static TR_BigInt* _pad(TR_BigInt* operand, int toSize)
-{
-	// Caution: this returns a non-canonical representation (which is why it is private)
-	TR_BigInt* result = TR_BigInt_alloc(operand->environment);
-	result->size = toSize;
-	result->negative = operand->negative;
-	result->bytes = operand->environment->allocator(toSize);
-
-	if (operand->size >= toSize)
-	{
-		return operand;
-	}
-
-	memset(result->bytes,0,toSize);
-	memcpy(result->bytes+(result->size-operand->size),operand->bytes,operand->size);
-
-	return result;		
-}
 
 static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 {
@@ -439,8 +459,4 @@ TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
 
 	return _multiply_naive(operand1,operand2);
 }
-
-
- 
-
 
