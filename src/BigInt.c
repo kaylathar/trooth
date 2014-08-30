@@ -65,7 +65,7 @@ static TR_BigInt* _canonicalize(TR_BigInt* operand)
 	result->bytes = bytes;
 	result->negative = operand->negative;
 	result->size = operand->size-i;
-	operand->environment->dealllocator(bytes);
+	operand->environment->deallocator(bytes);
 	
 	return result;
 
