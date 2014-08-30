@@ -290,6 +290,7 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 	char* bytes;
 
 	bytes = operand1->environment->allocator(size);
+	memset(bytes,0,size);
 	k = size-1;
 
 	
@@ -303,16 +304,17 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 		carry /= 10;			
 	}
 
-	if (k==0)
-		size-=1;
 
 	result->negative = (operand1->negative && operand2->negative);
 	result->bytes = operand1->environment->allocator(size);
 	result->size = size;
-	memcpy(result->bytes,k==0?bytes+1:bytes,size);
+
+	memcpy(result->bytes,bytes,size);
+
 	operand1->environment->deallocator(bytes);
 
-	return result;
+
+	return _canonicalize(result);
 }
 
 static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
@@ -386,7 +388,7 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	{
 		return _multiply_naive(operand1,operand2);
 	}
-	
+
 	maxSize = operand1->size>operand2->size?operand1->size:operand2->size;
 	midpoint = maxSize/2;
 	expo = maxSize%2==0?midpoint:midpoint+1;
@@ -408,6 +410,7 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	lowOp1->size = operand1->size - midpoint;
 	lowOp2->size = operand2->size - midpoint;
 
+
 	highOp1->bytes = env->allocator(lowOp1->size);
 	highOp2->bytes = env->allocator(lowOp2->size);
 	lowOp1->bytes = env->allocator(highOp1->size);
@@ -418,15 +421,16 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	memcpy(lowOp1->bytes,operand1->bytes+(midpoint),lowOp1->size);
 	memcpy(lowOp2->bytes,operand2->bytes+(midpoint),lowOp2->size);
 
-
 	combined1 = TR_BigInt_add(lowOp1,highOp1);
 	combined2 = TR_BigInt_add(lowOp2,highOp2);
+
 
 	int1 = _multiply_karatsuba(lowOp1,lowOp2);
 	int2 = _multiply_karatsuba(combined1,combined2);
 	int3 = _multiply_karatsuba(highOp1,highOp2);
 
-	char* buf = env->allocator(midpoint*2);
+
+	char* buf = env->allocator(midpoint*10);
 	memset(buf,0,midpoint*10);
 	snprintf(buf,midpoint*10,"%d",(int)pow(10,2*expo));
 	tmp = TR_BigInt_fromString(env,buf);
