@@ -23,6 +23,7 @@ struct TR_Environment
 {
         TR_Internal_Dispatch dispatch;
         TR_Internal_Alloc allocator;
+	TR_Internal_Alloc stack_allocator;
         TR_Internal_Free deallocator;
 
 	// When we branch envs, we need to separate this out
