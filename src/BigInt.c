@@ -289,8 +289,10 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 	TR_BigInt* result = TR_BigInt_alloc(operand1->environment);
 	char subtract = operand1->negative ^ operand2->negative;
 	char digit1,digit2,carry;
-	size = (MAX(operand1->size,operand2->size)+1);
+	size = MAX(operand1->size,operand2->size);
 	char* bytes;
+	
+	size += 1;
 
 	bytes = operand1->environment->allocator(size);
 	memset(bytes,0,size);
@@ -364,7 +366,7 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 	result->bytes = result->environment->allocator(result->size);
 	memcpy(result->bytes,bytes+(size-realsize),realsize);
 	//operand1->environment->deallocator(bytes);
-	return result;
+	return _canonicalize(result);
 }
 
 static TR_BigInt* _karatsuba_safe_power(TR_Environment* env,int expo)
@@ -385,6 +387,12 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	char negative;
 	negative = operand1->negative ^ operand2->negative;
 
+	
+	if (operand1->size < 2 || operand2->size < 2)
+	{
+		return _multiply_naive(operand1,operand2);
+	}
+	
 	// Equalize operands
 	if (operand2->size > operand1->size)
 	{
@@ -395,19 +403,10 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 		operand2 = _pad(operand2,operand1->size);
 	}		
 
-	if (operand1->size < 2 || operand2->size < 2)
-	{
-		return _multiply_naive(operand1,operand2);
-	}
 
-	maxSize = operand1->size>operand2->size?operand1->size:operand2->size;
+	maxSize = operand1->size;
 	midpoint = maxSize/2;
 	expo = maxSize%2==0?midpoint:midpoint+1;
-
-	if (midpoint > operand1->size || midpoint > operand2->size)
-	{
-		midpoint = operand1->size<operand2->size?operand1->size-1:operand2->size-1;
-	}
 
 	
 	TR_Environment* env = operand1->environment;	
@@ -434,6 +433,9 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 
 	combined1 = TR_BigInt_add(lowOp1,highOp1);
 	combined2 = TR_BigInt_add(lowOp2,highOp2);
+	
+	TR_BigInt* c1 = combined1;
+	TR_BigInt* c2 = combined2;
 
 
 	int1 = _multiply_karatsuba(lowOp1,lowOp2);
@@ -449,13 +451,13 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	combined2 = TR_BigInt_subtract(combined1,int1);
 	combined1 = _multiply_naive(combined2,tmp);
 
-	TR_BigInt* tr = result;
 	result = TR_BigInt_add(result,combined1);
-	
-	TR_BigInt* tt = result;
 	result = TR_BigInt_add(result,int1);
 
 	result->negative = negative;
+	
+
+	
 	return _canonicalize(result);
 }
 
