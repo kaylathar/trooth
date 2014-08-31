@@ -65,7 +65,6 @@ static TR_BigInt* _canonicalize(TR_BigInt* operand)
 	result->bytes = bytes;
 	result->negative = operand->negative;
 	result->size = operand->size-i;
-	operand->environment->deallocator(bytes);
 	
 	return result;
 
@@ -315,8 +314,7 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 
 	memcpy(result->bytes,bytes,size);
 
-	operand1->environment->deallocator(bytes);
-
+	//operand1->environment->deallocator(bytes);
 
 	return _canonicalize(result);
 }
@@ -365,11 +363,20 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 	result->size = realsize;
 	result->bytes = result->environment->allocator(result->size);
 	memcpy(result->bytes,bytes+(size-realsize),realsize);
-	operand1->environment->deallocator(bytes);
+	//operand1->environment->deallocator(bytes);
 	return result;
 }
 
-
+static TR_BigInt* _karatsuba_safe_power(TR_Environment* env,int expo)
+{
+	// Is safe to use int for expo since it is used for size, it won't overflow
+	char* result = env->allocator(expo+1);
+	memset(result,'0',expo+2);
+	result[0] = '1';
+	result[expo+1] = '\0';
+	return TR_BigInt_fromString(env,result);
+		
+}
 
 static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 {
@@ -434,16 +441,10 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	int3 = _multiply_karatsuba(highOp1,highOp2);
 
 
-	char* buf = env->allocator(midpoint*10);
-	memset(buf,0,midpoint*10);
-	snprintf(buf,midpoint*10,"%d",(int)pow(10,2*expo));
-	tmp = TR_BigInt_fromString(env,buf);
+	tmp = _karatsuba_safe_power(env,2*expo);
 	result = _multiply_naive(int3,tmp);
 		
-
-	memset(buf,0,midpoint*10);
-	snprintf(buf,midpoint*10,"%d",(int)pow(10,expo));
-	tmp = TR_BigInt_fromString(env,buf);
+	tmp = _karatsuba_safe_power(env,expo);
 	combined1 = TR_BigInt_subtract(int2,int3);
 	combined2 = TR_BigInt_subtract(combined1,int1);
 	combined1 = _multiply_naive(combined2,tmp);
