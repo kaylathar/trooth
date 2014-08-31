@@ -37,6 +37,11 @@ TR_Environment* TR_Environment_alloc()
 	return env;
 }
 
+TR_Environment* TR_Environment_fromEnvironment(TR_Environment* env)
+{
+  
+}
+
 void TR_Environment_free(TR_Environment* env)
 {
 	free(env);
