@@ -5,6 +5,14 @@ struct TR_BigInt;
 
 typedef struct TR_BigInt TR_BigInt;
 
+struct TR_BigInt_Division_Result
+{
+    TR_BigInt* quotient;
+    TR_BigInt* remainder;
+};
+
+typedef struct TR_BigInt_Division_Result TR_BigInt_Division_Result
+
 TR_BigInt* TR_BigInt_alloc(TR_Environment* env);
 void TR_BigInt_free(TR_BigInt* number);
 TR_BigInt* TR_BigInt_fromString(TR_Environment* env,const char* str);

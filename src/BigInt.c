@@ -473,3 +473,39 @@ TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
 	return _multiply_naive(operand1,operand2);
 }
 
+TR_BigInt_Division_Result* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* operand2)
+{
+	// Naive division algorithm
+	TR_BigInt *quotient, *remainder,*one;
+	TR_BigInt_Division_Result* result;
+	int diff;
+	char negative;
+	
+	one = TR_BigInt_fromString(operand1->environment,"1");
+	quotient = TR_BigInt_fromString(operand1->environment,"0");
+	remainder = TR_BigInt_copy(operand1);
+	negative = operand1->negative ^ operand2->negative;
+	operand1 = TR_BigInt_copy(operand1);
+	operand2 = TR_BIgInt_copy(operand2);
+	operand1->negative = 0;
+	operand2->negative = 0;
+	
+	diff = TR_BigInt_compare(remainder,operand2);
+	while (diff == 0 || diff == 1)
+	{
+		quotient = TR_BigInt_add(quotient,one);
+		remainder = TR_BigInt_subtract(remainder,operand2);
+	  
+		diff = TR_BigInt_compare(remainder,operand2);
+
+	}
+	
+	quotient->negative = negative;
+	result = operand1->environment->allocator(sizeof(TR_BigInt_Division_Result));
+	result->quotient = quotient;
+	result->remainder = remainder;
+	
+	return result;
+  
+}
+
