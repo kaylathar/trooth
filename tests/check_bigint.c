@@ -191,6 +191,50 @@ START_TEST(bigint_multiply)
 }
 END_TEST
 
+
+START_TEST(bigint_divide)
+{
+	TR_Environment *env = TR_Environment_alloc();
+	TR_BigInt *num1 = TR_BigInt_fromString(env,"1200");
+	TR_BigInt *num2 = TR_BigInt_fromString(env,"-1200");
+	TR_BigInt *num3 = TR_BigInt_fromString(env,"12");
+	TR_BigInt *num4 = TR_BigInt_fromString(env,"-12");
+	TR_BigInt *num5 = TR_BigInt_fromString(env,LARGE_CHECK_NUMBER);
+	TR_BigInt *num6 = TR_BigInt_fromString(env,LARGE_CHECK_NUMBER2);
+
+	// pos/pos
+	TR_BigInt_Division_Result *result1 = TR_BigInt_divide(num3,num1);
+	TR_BigInt_Division_Result *result2 = TR_BigInt_divide(num1,num3);
+	//ck_assert(TR_BigInt_equal(result1,result2));
+	ck_assert_str_eq(TR_BigInt_toString(result1->quotient),"0");
+	ck_assert_str_eq(TR_BigInt_toString(result1->remainder),"12");
+	ck_assert_str_eq(TR_BigInt_toString(result2->quotient),"100");
+	ck_assert_str_eq(TR_BigInt_toString(result2->remainder),"0");
+
+	
+
+	// neg/neg
+	TR_BigInt_Division_Result *result3 = TR_BigInt_divide(num2,num4);
+	TR_BigInt_Division_Result *result4 = TR_BigInt_divide(num4,num2);
+	//ck_assert(TR_BigInt_equal(result3,result4));
+	ck_assert_str_eq(TR_BigInt_toString(result3->quotient),"100");
+	ck_assert_str_eq(TR_BigInt_toString(result3->remainder),"0");
+	ck_assert_str_eq(TR_BigInt_toString(result3->quotient),"0");
+	ck_assert_str_eq(TR_BigInt_toString(result3->remainder),"12");
+
+	// pos/neg
+	TR_BigInt_Division_Result *result5 = TR_BigInt_divide(num1,num4);	
+	TR_BigInt_Division_Result *result6 = TR_BigInt_divide(num4,num1);
+	//ck_assert(TR_BigInt_equal(result5,result6));
+	ck_assert_str_eq(TR_BigInt_toString(result5->quotient),"-100");
+	ck_assert_str_eq(TR_BigInt_toString(result5->remainder),"0");
+	ck_assert_str_eq(TR_BigInt_toString(result5->quotient),"0");
+	ck_assert_str_eq(TR_BigInt_toString(result5->remainder),"12");
+
+	TR_Environment_free(env);
+}
+END_TEST
+
 Suite* bigint_suite()
 {
 	Suite *suite;
@@ -204,6 +248,7 @@ Suite* bigint_suite()
 	tcase_add_test(testCore,bigint_init);
 	tcase_add_test(testCore,bigint_compare);
 	tcase_add_test(testCore,bigint_multiply);
+	tcase_add_test(testCore,bigint_divide);
 
 	suite_add_tcase(suite,testCore);
 
