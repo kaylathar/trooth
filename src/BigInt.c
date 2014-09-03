@@ -486,10 +486,9 @@ TR_BigInt_Division_Result* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* oper
 	remainder = TR_BigInt_copy(operand1);
 	negative = operand1->negative ^ operand2->negative;
 	operand1 = TR_BigInt_copy(operand1);
-	operand2 = TR_BIgInt_copy(operand2);
+	operand2 = TR_BigInt_copy(operand2);
 	operand1->negative = 0;
 	operand2->negative = 0;
-	
 	diff = TR_BigInt_compare(remainder,operand2);
 	while (diff == 0 || diff == 1)
 	{

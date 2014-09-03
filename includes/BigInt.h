@@ -11,7 +11,7 @@ struct TR_BigInt_Division_Result
     TR_BigInt* remainder;
 };
 
-typedef struct TR_BigInt_Division_Result TR_BigInt_Division_Result
+typedef struct TR_BigInt_Division_Result TR_BigInt_Division_Result;
 
 TR_BigInt* TR_BigInt_alloc(TR_Environment* env);
 void TR_BigInt_free(TR_BigInt* number);
