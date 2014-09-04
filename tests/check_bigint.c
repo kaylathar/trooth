@@ -156,20 +156,20 @@ START_TEST(bigint_multiply)
 	// pos/pos
 	TR_BigInt *result1 = TR_BigInt_multiply(num3,num1);
 	TR_BigInt *result2 = TR_BigInt_multiply(num1,num3);
-	//ck_assert(TR_BigInt_equal(result1,result2));
+	ck_assert(TR_BigInt_equal(result1,result2));
 	ck_assert_str_eq(TR_BigInt_toString(result1),"1476");
 	
 
 	// neg/neg
 	TR_BigInt *result3 = TR_BigInt_multiply(num2,num4);
 	TR_BigInt *result4 = TR_BigInt_multiply(num4,num2);
-	//ck_assert(TR_BigInt_equal(result3,result4));
+	ck_assert(TR_BigInt_equal(result3,result4));
 	ck_assert_str_eq(TR_BigInt_toString(result3),"1476");
 
 	// pos/neg
 	TR_BigInt *result5 = TR_BigInt_multiply(num1,num4);	
 	TR_BigInt *result6 = TR_BigInt_multiply(num4,num1);
-	//ck_assert(TR_BigInt_equal(result5,result6));
+	ck_assert(TR_BigInt_equal(result5,result6));
 	ck_assert_str_eq(TR_BigInt_toString(result5),"-1476");
 
 	// large
@@ -205,7 +205,6 @@ START_TEST(bigint_divide)
 	// pos/pos
 	TR_BigInt_Division_Result *result1 = TR_BigInt_divide(num3,num1);
 	TR_BigInt_Division_Result *result2 = TR_BigInt_divide(num1,num3);
-	//ck_assert(TR_BigInt_equal(result1,result2));
 	ck_assert_str_eq(TR_BigInt_toString(result1->quotient),"0");
 	ck_assert_str_eq(TR_BigInt_toString(result1->remainder),"12");
 	ck_assert_str_eq(TR_BigInt_toString(result2->quotient),"100");
@@ -216,7 +215,6 @@ START_TEST(bigint_divide)
 	// neg/neg
 	TR_BigInt_Division_Result *result3 = TR_BigInt_divide(num2,num4);
 	TR_BigInt_Division_Result *result4 = TR_BigInt_divide(num4,num2);
-	//ck_assert(TR_BigInt_equal(result3,result4));
 	ck_assert_str_eq(TR_BigInt_toString(result3->quotient),"100");
 	ck_assert_str_eq(TR_BigInt_toString(result3->remainder),"0");
 	ck_assert_str_eq(TR_BigInt_toString(result3->quotient),"0");
@@ -225,7 +223,6 @@ START_TEST(bigint_divide)
 	// pos/neg
 	TR_BigInt_Division_Result *result5 = TR_BigInt_divide(num1,num4);	
 	TR_BigInt_Division_Result *result6 = TR_BigInt_divide(num4,num1);
-	//ck_assert(TR_BigInt_equal(result5,result6));
 	ck_assert_str_eq(TR_BigInt_toString(result5->quotient),"-100");
 	ck_assert_str_eq(TR_BigInt_toString(result5->remainder),"0");
 	ck_assert_str_eq(TR_BigInt_toString(result5->quotient),"0");
