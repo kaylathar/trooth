@@ -46,6 +46,13 @@ static TR_BigInt* _canonicalize(TR_BigInt* operand)
 	int i;
 	char *bytes;
 	
+	if (operand->size == 1 && operand->bytes[0] == 0)
+	{
+	  result = TR_BigInt_copy(operand);
+	  result->negative = 0;
+	  return result;
+	}
+	
 	for (i = 0; i < operand->size; ++i)
         {
                 if (operand->bytes[i] != 0)
@@ -483,12 +490,12 @@ TR_BigInt_Division_Result* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* oper
 	
 	one = TR_BigInt_fromString(operand1->environment,"1");
 	quotient = TR_BigInt_fromString(operand1->environment,"0");
-	remainder = TR_BigInt_copy(operand1);
 	negative = operand1->negative ^ operand2->negative;
 	operand1 = TR_BigInt_copy(operand1);
 	operand2 = TR_BigInt_copy(operand2);
 	operand1->negative = 0;
 	operand2->negative = 0;
+	remainder = TR_BigInt_copy(operand1);
 	diff = TR_BigInt_compare(remainder,operand2);
 	while (diff == 0 || diff == 1)
 	{
@@ -501,8 +508,8 @@ TR_BigInt_Division_Result* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* oper
 	
 	quotient->negative = negative;
 	result = operand1->environment->allocator(sizeof(TR_BigInt_Division_Result));
-	result->quotient = quotient;
-	result->remainder = remainder;
+	result->quotient = _canonicalize(quotient);
+	result->remainder = _canonicalize(remainder);
 	
 	return result;
   

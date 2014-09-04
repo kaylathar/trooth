@@ -217,16 +217,16 @@ START_TEST(bigint_divide)
 	TR_BigInt_Division_Result *result4 = TR_BigInt_divide(num4,num2);
 	ck_assert_str_eq(TR_BigInt_toString(result3->quotient),"100");
 	ck_assert_str_eq(TR_BigInt_toString(result3->remainder),"0");
-	ck_assert_str_eq(TR_BigInt_toString(result3->quotient),"0");
-	ck_assert_str_eq(TR_BigInt_toString(result3->remainder),"12");
+	ck_assert_str_eq(TR_BigInt_toString(result4->quotient),"0");
+	ck_assert_str_eq(TR_BigInt_toString(result4->remainder),"12");
 
 	// pos/neg
 	TR_BigInt_Division_Result *result5 = TR_BigInt_divide(num1,num4);	
 	TR_BigInt_Division_Result *result6 = TR_BigInt_divide(num4,num1);
 	ck_assert_str_eq(TR_BigInt_toString(result5->quotient),"-100");
 	ck_assert_str_eq(TR_BigInt_toString(result5->remainder),"0");
-	ck_assert_str_eq(TR_BigInt_toString(result5->quotient),"0");
-	ck_assert_str_eq(TR_BigInt_toString(result5->remainder),"12");
+	ck_assert_str_eq(TR_BigInt_toString(result6->quotient),"0");
+	ck_assert_str_eq(TR_BigInt_toString(result6->remainder),"12");
 
 	TR_Environment_free(env);
 }
