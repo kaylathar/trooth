@@ -10,6 +10,14 @@ union TR_Data
         TR_BigInt* bigint;
 };
 
+struct TR_Environment_Container
+{
+	void* data;
+	struct TR_Environment_Container* next;
+};
+
+typedef struct TR_Environment_Container TR_Environment_Container;
+
 
 // Callback defs
 typedef TR_Data (*TR_Internal_TaskCallback)(TR_Data);
@@ -27,7 +35,7 @@ struct TR_Environment
         TR_Internal_Free deallocator;
 
 	// When we branch envs, we need to separate this out
-	void** used;	
+	TR_Environment_Container* used;	
 };
 
 #endif
