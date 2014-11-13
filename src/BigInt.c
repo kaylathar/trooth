@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <math.h>
 
+/**************/
+/* Structures */
+/**************/
 struct TR_BigInt
 {
 	char *bytes;
@@ -14,9 +17,54 @@ struct TR_BigInt
 	TR_Environment* environment;
 };
 
+struct TR_BigInt_DivisionResult
+{
+    TR_BigInt* quotient;
+    TR_BigInt* remainder;
+    TR_Environment* environment;
+};
+
+
+
+/*****************/
+/* Alloc/dealloc */
+/*****************/
+TR_BigInt* TR_BigInt_alloc(TR_Environment* env)
+{
+	TR_BigInt* result = env->allocator(sizeof(TR_BigInt));
+	result->size = 0;
+	result->bytes = NULL;
+	result->negative = 0;
+	result->environment = env;
+	return result;
+}
+
+void TR_BigInt_free(TR_BigInt *number)
+{
+	if (number->bytes != NULL)
+	{
+		number->environment->deallocator(number->bytes);
+	}
+	number->environment->deallocator(number);
+}
+
+TR_BigInt* TR_BigInt_copy(TR_BigInt *toCopy)
+{
+	TR_BigInt* result = TR_BigInt_alloc(toCopy->environment);
+	result->negative = toCopy->negative; 
+	result->size = toCopy->size;
+	result->bytes = toCopy->environment->allocator(result->size);
+	memcpy(result->bytes,toCopy->bytes,toCopy->size);
+
+	return result;
+}
+
+
+
 
 /*********************/
 /* Utility Functions */
+/*********************/
 static TR_BigInt* _pad(TR_BigInt* operand, int toSize)
 {
 	// Caution: this returns a non-canonical representation (which is why it is private)
@@ -24,7 +72,7 @@ static TR_BigInt* _pad(TR_BigInt* operand, int toSize)
 
 	if (operand->size >= toSize)
 	{
-		return operand;
+		return TR_BigInt_copy(operand);
 	}
 	
 	result = TR_BigInt_alloc(operand->environment);
@@ -62,7 +110,7 @@ static TR_BigInt* _canonicalize(TR_BigInt* operand)
 
 	if (i == 0)
 	{
-		return operand;
+		return TR_BigInt_copy(operand);
 	}
 
 	result = TR_BigInt_alloc(operand->environment);
@@ -80,43 +128,10 @@ static TR_BigInt* _canonicalize(TR_BigInt* operand)
 
 
 
-/*******************/
-/**Alloc/dealloc****/
 
-TR_BigInt* TR_BigInt_alloc(TR_Environment* env)
-{
-	TR_BigInt* result = env->allocator(sizeof(TR_BigInt));
-	result->size = 0;
-	result->bytes = NULL;
-	result->negative = 0;
-	result->environment = env;
-	return result;
-}
-
-void TR_BigInt_free(TR_BigInt *number)
-{
-	if (number->bytes != NULL)
-	{
-		number->environment->deallocator(number->bytes);
-	}
-	number->environment->deallocator(number);
-}
-
-TR_BigInt* TR_BigInt_copy(TR_BigInt *toCopy)
-{
-	TR_BigInt* result = TR_BigInt_alloc(toCopy->environment);
-	result->negative = toCopy->negative; 
-	result->size = toCopy->size;
-	result->bytes = toCopy->environment->allocator(result->size);
-	memcpy(result->bytes,toCopy->bytes,toCopy->size);
-
-	return result;
-}
-
-
-/*********************/
-/***Input/Output******/
-
+/****************/
+/* Input/Output */
+/****************/
 TR_BigInt* TR_BigInt_fromString(TR_Environment* env,const char* str)
 {
 	const char* cur = str;
@@ -167,16 +182,9 @@ const char* TR_BigInt_toString(TR_BigInt *number)
 	return origin;
 }
 
-/**************************/
-/**Comparison/Processing**/
-
-TR_BigInt* TR_BigInt_absolute(TR_BigInt* operand)
-{
-	TR_BigInt* result = TR_BigInt_copy(operand);
-	result->negative = 0;
-	return result;
-}
-
+/*************************/
+/* Comparison/Processing */
+/*************************/
 int TR_BigInt_compare(TR_BigInt *operand1, TR_BigInt *operand2)
 {
 	int i;
@@ -230,8 +238,17 @@ char TR_BigInt_equal(TR_BigInt *operand1,TR_BigInt *operand2)
 }
 
 
-/***************/
-/**Operations**/
+/**************/
+/* Operations */
+/**************/
+
+TR_BigInt* TR_BigInt_absolute(TR_BigInt* operand)
+{
+	TR_BigInt* result = TR_BigInt_copy(operand);
+	result->negative = 0;
+	return result;
+}
+
 
 TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 {
@@ -379,11 +396,14 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 static TR_BigInt* _karatsuba_safe_power(TR_Environment* env,int expo)
 {
 	// Is safe to use int for expo since it is used for size, it won't overflow
+	TR_BigInt* tmp;
 	char* result = env->allocator(expo+1);
 	memset(result,'0',expo+2);
 	result[0] = '1';
 	result[expo+1] = '\0';
-	return TR_BigInt_fromString(env,result);
+	tmp = TR_BigInt_fromString(env,result);
+	env->deallocator(result);
+	return tmp;
 		
 }
 
@@ -480,38 +500,70 @@ TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
 	return _multiply_naive(operand1,operand2);
 }
 
-TR_BigInt_Division_Result* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* operand2)
+TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* operand2)
 {
 	// Naive division algorithm
-	TR_BigInt *quotient, *remainder,*one;
-	TR_BigInt_Division_Result* result;
+	TR_BigInt *quotient, *remainder,*one,*zero,*tmp;
+	TR_BigInt_DivisionResult* result;
 	int diff;
 	char negative;
 	
 	one = TR_BigInt_fromString(operand1->environment,"1");
-	quotient = TR_BigInt_fromString(operand1->environment,"0");
+	zero = TR_BigInt_fromString(operand1->environment,"0");
+	quotient = zero;
 	negative = operand1->negative ^ operand2->negative;
 	operand1 = TR_BigInt_copy(operand1);
 	operand2 = TR_BigInt_copy(operand2);
 	operand1->negative = 0;
 	operand2->negative = 0;
-	remainder = TR_BigInt_copy(operand1);
+	remainder = operand1;
 	diff = TR_BigInt_compare(remainder,operand2);
 	while (diff == 0 || diff == 1)
 	{
-		quotient = TR_BigInt_add(quotient,one);
-		remainder = TR_BigInt_subtract(remainder,operand2);
-	  
+		tmp = TR_BigInt_add(quotient,one);
+		//TR_BigInt_free(quotient);
+		quotient = tmp;
+		
+		tmp = TR_BigInt_subtract(remainder,operand2);
+		//TR_BigInt_free(remainder);
+		remainder = tmp;
+		
 		diff = TR_BigInt_compare(remainder,operand2);
 
 	}
 	
 	quotient->negative = negative;
-	result = operand1->environment->allocator(sizeof(TR_BigInt_Division_Result));
+	result = operand1->environment->allocator(sizeof(TR_BigInt_DivisionResult));
 	result->quotient = _canonicalize(quotient);
+	//TR_BigInt_free(quotient);
 	result->remainder = _canonicalize(remainder);
+	/*TR_BigInt_free(remainder);
+	TR_BigInt_free(zero);
+	TR_BigInt_free(one);
+	TR_BigInt_free(operand1);
+	TR_BigInt_free(operand2);*/
 	
 	return result;
   
 }
+
+/***************************/
+/* DivisionResult Handling */
+/***************************/
+void TR_BigInt_DivisionResult_free(TR_BigInt_DivisionResult* toFree)
+{
+	toFree->environment->deallocator(toFree);
+}
+
+TR_BigInt* TR_BigInt_DivisionResult_remainder(TR_BigInt_DivisionResult* result)
+{
+	return result->remainder;
+}
+
+TR_BigInt* TR_BigInt_DivisionResult_quotient(TR_BigInt_DivisionResult* result)
+{
+  	return result->quotient;
+}
+
+
 

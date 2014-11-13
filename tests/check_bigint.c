@@ -1,5 +1,4 @@
 #include "BigInt.h"
-#include "util.h"
 #include <stdlib.h>
 #include <check.h>
 
@@ -183,10 +182,13 @@ START_TEST(bigint_multiply)
 	TR_BigInt_free(result4);
 	TR_BigInt_free(result5);
 	TR_BigInt_free(result6);
+	TR_BigInt_free(result7);
 	TR_BigInt_free(num1);
 	TR_BigInt_free(num2);
 	TR_BigInt_free(num3);
 	TR_BigInt_free(num4);
+	TR_BigInt_free(num5);
+	TR_BigInt_free(num6);
 	TR_Environment_free(env);
 }
 END_TEST
@@ -203,31 +205,43 @@ START_TEST(bigint_divide)
 	TR_BigInt *num6 = TR_BigInt_fromString(env,LARGE_CHECK_NUMBER2);
 
 	// pos/pos
-	TR_BigInt_Division_Result *result1 = TR_BigInt_divide(num3,num1);
-	TR_BigInt_Division_Result *result2 = TR_BigInt_divide(num1,num3);
-	ck_assert_str_eq(TR_BigInt_toString(result1->quotient),"0");
-	ck_assert_str_eq(TR_BigInt_toString(result1->remainder),"12");
-	ck_assert_str_eq(TR_BigInt_toString(result2->quotient),"100");
-	ck_assert_str_eq(TR_BigInt_toString(result2->remainder),"0");
+	TR_BigInt_DivisionResult *result1 = TR_BigInt_divide(num3,num1);
+	TR_BigInt_DivisionResult *result2 = TR_BigInt_divide(num1,num3);
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_quotient(result1)),"0");
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result1)),"12");
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_quotient(result2)),"100");
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result2)),"0");
 
 	
 
 	// neg/neg
-	TR_BigInt_Division_Result *result3 = TR_BigInt_divide(num2,num4);
-	TR_BigInt_Division_Result *result4 = TR_BigInt_divide(num4,num2);
-	ck_assert_str_eq(TR_BigInt_toString(result3->quotient),"100");
-	ck_assert_str_eq(TR_BigInt_toString(result3->remainder),"0");
-	ck_assert_str_eq(TR_BigInt_toString(result4->quotient),"0");
-	ck_assert_str_eq(TR_BigInt_toString(result4->remainder),"12");
+	TR_BigInt_DivisionResult *result3 = TR_BigInt_divide(num2,num4);
+	TR_BigInt_DivisionResult *result4 = TR_BigInt_divide(num4,num2);
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_quotient(result3)),"100");
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result3)),"0");
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_quotient(result4)),"0");
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result4)),"12");
 
 	// pos/neg
-	TR_BigInt_Division_Result *result5 = TR_BigInt_divide(num1,num4);	
-	TR_BigInt_Division_Result *result6 = TR_BigInt_divide(num4,num1);
-	ck_assert_str_eq(TR_BigInt_toString(result5->quotient),"-100");
-	ck_assert_str_eq(TR_BigInt_toString(result5->remainder),"0");
-	ck_assert_str_eq(TR_BigInt_toString(result6->quotient),"0");
-	ck_assert_str_eq(TR_BigInt_toString(result6->remainder),"12");
+	TR_BigInt_DivisionResult *result5 = TR_BigInt_divide(num1,num4);	
+	TR_BigInt_DivisionResult *result6 = TR_BigInt_divide(num4,num1);
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_quotient(result5)),"-100");
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result5)),"0");
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_quotient(result6)),"0");
+	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result6)),"12");
 
+	TR_BigInt_free(num1);
+	TR_BigInt_free(num2);
+	TR_BigInt_free(num3);
+	TR_BigInt_free(num4);
+	TR_BigInt_free(num5);
+	TR_BigInt_free(num6);
+	TR_BigInt_DivisionResult_free(result1);
+	TR_BigInt_DivisionResult_free(result2);
+	TR_BigInt_DivisionResult_free(result3);
+	TR_BigInt_DivisionResult_free(result4);
+	TR_BigInt_DivisionResult_free(result5);
+	TR_BigInt_DivisionResult_free(result6);
 	TR_Environment_free(env);
 }
 END_TEST
