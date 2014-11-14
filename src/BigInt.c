@@ -456,26 +456,41 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 
 	combined1 = TR_BigInt_add(lowOp1,highOp1);
 	combined2 = TR_BigInt_add(lowOp2,highOp2);
-	
-	TR_BigInt* c1 = combined1;
-	TR_BigInt* c2 = combined2;
-
 
 	int1 = _multiply_karatsuba(lowOp1,lowOp2);
 	int2 = _multiply_karatsuba(combined1,combined2);
 	int3 = _multiply_karatsuba(highOp1,highOp2);
 
+	TR_BigInt_free(lowOp1);
+	TR_BigInt_free(lowOp2);
+	TR_BigInt_free(highOp1);
+	TR_BigInt_free(highOp2);
+	TR_BigInt_free(combined1);
+	TR_BigInt_free(combined2);
 
 	tmp = _karatsuba_safe_power(env,2*expo);
 	result = _multiply_naive(int3,tmp);
+	TR_BigInt_free(tmp);
 		
 	tmp = _karatsuba_safe_power(env,expo);
 	combined1 = TR_BigInt_subtract(int2,int3);
 	combined2 = TR_BigInt_subtract(combined1,int1);
+	TR_BigInt_free(combined1);
 	combined1 = _multiply_naive(combined2,tmp);
 
-	result = TR_BigInt_add(result,combined1);
-	result = TR_BigInt_add(result,int1);
+	TR_BigInt_free(tmp);
+	
+	tmp = TR_BigInt_add(result,combined1);
+	TR_BigInt_free(result);
+	result = tmp;
+	
+	tmp = TR_BigInt_add(result,int1);
+	TR_BigInt_free(result);
+	result = tmp;
+	
+	TR_BigInt_free(int1);
+	TR_BigInt_free(int2);
+	TR_BigInt_free(int3);
 
 	result->negative = negative;
 	
@@ -488,7 +503,7 @@ TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
 {
 
 	// ~ 12 is when Karatsuba's exceeds performance of naive multiplication
-	if (operand1->size > 11 || operand2->size > 11)
+	if (MAX(operand1->size, operand2->size) > 11)
 	{
 		return _multiply_karatsuba(operand1,operand2);
 	}
