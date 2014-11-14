@@ -65,64 +65,58 @@ TR_BigInt* TR_BigInt_copy(TR_BigInt *toCopy)
 /*********************/
 /* Utility Functions */
 /*********************/
-static TR_BigInt* _pad(TR_BigInt* operand, int toSize)
+
+/* All of the below util functions operate 'in place' for efficiency */
+static void _pad(TR_BigInt* operand, int toSize)
 {
 	// Caution: this returns a non-canonical representation (which is why it is private)
 	TR_BigInt* result;
+	char* bytes;
 
-	if (operand->size >= toSize)
+	if (operand->size < toSize)
 	{
-		return TR_BigInt_copy(operand);
+		bytes = operand->environment->allocator(toSize);
+
+		memset(bytes,0,toSize);
+		memcpy(bytes+(toSize-operand->size),operand->bytes,operand->size);
+		
+		operand->environment->deallocator(operand->bytes);
+		operand->size = toSize;
+		operand->bytes = bytes;
 	}
-	
-	result = TR_BigInt_alloc(operand->environment);
-	result->size = toSize;
-	result->negative = operand->negative;
-	result->bytes = operand->environment->allocator(toSize);
 
-	memset(result->bytes,0,toSize);
-	memcpy(result->bytes+(result->size-operand->size),operand->bytes,operand->size);
-
-	return result;		
 }
 
 
-static TR_BigInt* _canonicalize(TR_BigInt* operand)
+static void _canonicalize(TR_BigInt* operand)
 {
-
-	TR_BigInt* result;
 	int i;
 	char *bytes;
 	
+	/* Only one zero representation */
 	if (operand->size == 1 && operand->bytes[0] == 0)
 	{
-	  result = TR_BigInt_copy(operand);
-	  result->negative = 0;
-	  return result;
+	  operand->negative = 0;
+	  return;
 	}
 	
+	/* no leading zeros */
 	for (i = 0; i < operand->size; ++i)
         {
                 if (operand->bytes[i] != 0)
                         break;
         }
 
-
 	if (i == 0)
 	{
-		return TR_BigInt_copy(operand);
+		return;
 	}
-
-	result = TR_BigInt_alloc(operand->environment);
 
 	bytes = operand->environment->allocator(operand->size-i);
 	memcpy(bytes,operand->bytes+i,operand->size-i);
-	result->bytes = bytes;
-	result->negative = operand->negative;
-	result->size = operand->size-i;
-	
-	return result;
-
+	operand->environment->deallocator(operand->bytes);
+	operand->bytes = bytes;
+	operand->size = operand->size-i;
 	
 }
 
@@ -342,7 +336,8 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 
 	//operand1->environment->deallocator(bytes);
 
-	return _canonicalize(result);
+	_canonicalize(result);
+	return result;
 }
 
 static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
@@ -390,7 +385,8 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 	result->bytes = result->environment->allocator(result->size);
 	memcpy(result->bytes,bytes+(size-realsize),realsize);
 	//operand1->environment->deallocator(bytes);
-	return _canonicalize(result);
+	_canonicalize(result);
+	return result;
 }
 
 static TR_BigInt* _karatsuba_safe_power(TR_Environment* env,int expo)
@@ -423,11 +419,11 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	// Equalize operands
 	if (operand2->size > operand1->size)
 	{
-		operand1 = _pad(operand1,operand2->size);
+		_pad(operand1,operand2->size);
 	}
 	else if (operand2->size < operand1->size)
 	{
-		operand2 = _pad(operand2,operand1->size);
+		_pad(operand2,operand1->size);
 	}		
 
 
@@ -483,9 +479,9 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 
 	result->negative = negative;
 	
-
+	_canonicalize(result);
 	
-	return _canonicalize(result);
+	return result;
 }
 
 TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
@@ -521,11 +517,11 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 	while (diff == 0 || diff == 1)
 	{
 		tmp = TR_BigInt_add(quotient,one);
-		//TR_BigInt_free(quotient);
+		TR_BigInt_free(quotient);
 		quotient = tmp;
 		
 		tmp = TR_BigInt_subtract(remainder,operand2);
-		//TR_BigInt_free(remainder);
+		TR_BigInt_free(remainder);
 		remainder = tmp;
 		
 		diff = TR_BigInt_compare(remainder,operand2);
@@ -534,14 +530,10 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 	
 	quotient->negative = negative;
 	result = operand1->environment->allocator(sizeof(TR_BigInt_DivisionResult));
-	result->quotient = _canonicalize(quotient);
-	//TR_BigInt_free(quotient);
-	result->remainder = _canonicalize(remainder);
-	/*TR_BigInt_free(remainder);
-	TR_BigInt_free(zero);
-	TR_BigInt_free(one);
-	TR_BigInt_free(operand1);
-	TR_BigInt_free(operand2);*/
+	_canonicalize(quotient);
+	result->quotient = quotient;
+	_canonicalize(remainder);
+	result->remainder = remainder;
 	
 	return result;
   

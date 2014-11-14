@@ -212,8 +212,6 @@ START_TEST(bigint_divide)
 	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_quotient(result2)),"100");
 	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result2)),"0");
 
-	
-
 	// neg/neg
 	TR_BigInt_DivisionResult *result3 = TR_BigInt_divide(num2,num4);
 	TR_BigInt_DivisionResult *result4 = TR_BigInt_divide(num4,num2);
@@ -236,12 +234,6 @@ START_TEST(bigint_divide)
 	TR_BigInt_free(num4);
 	TR_BigInt_free(num5);
 	TR_BigInt_free(num6);
-	TR_BigInt_DivisionResult_free(result1);
-	TR_BigInt_DivisionResult_free(result2);
-	TR_BigInt_DivisionResult_free(result3);
-	TR_BigInt_DivisionResult_free(result4);
-	TR_BigInt_DivisionResult_free(result5);
-	TR_BigInt_DivisionResult_free(result6);
 	TR_Environment_free(env);
 }
 END_TEST
