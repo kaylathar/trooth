@@ -63,7 +63,7 @@ TR_BigInt* TR_BigInt_fromString(TR_Environment* env,const char* str);
  * Convert a big integer object into a null terminated C-string
  * @return Null terminated c-string representation of given big integer in radix-10
  */
-const char* TR_BigInt_toString(TR_BigInt *number);
+char* TR_BigInt_toString(TR_BigInt *number);
 
 
 

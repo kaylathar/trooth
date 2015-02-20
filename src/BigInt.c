@@ -149,7 +149,7 @@ TR_BigInt* TR_BigInt_fromString(TR_Environment* env,const char* str)
 	return number;	
 }
 
-const char* TR_BigInt_toString(TR_BigInt *number)
+char* TR_BigInt_toString(TR_BigInt *number)
 {
 	int size = number->size;
 	char *buf,*origin;
