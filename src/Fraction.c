@@ -19,6 +19,8 @@ TR_Fraction* TR_Fraction_alloc(TR_Environment* env)
 {
 	TR_Fraction* retVal =  env->allocator(sizeof(TR_Fraction));
 	retVal->environment = env;
+	retVal->numerator = NULL;
+	retVal->denominator = NULL;
 	return retVal;
 }
 
@@ -58,8 +60,8 @@ char* TR_Fraction_toString(TR_Fraction *fraction) {
 	strcpy(result,numerator);
 	strcat(result,"/");
 	strcat(result,denominator);
-	free(numerator);
-	free(denominator);
+	fraction->environment->deallocator(numerator);
+	fraction->environment->deallocator(denominator);
 	return result;
 }
 TR_Fraction* TR_Fraction_fromString(TR_Environment* env, const char* str) {
@@ -75,6 +77,7 @@ TR_Fraction* TR_Fraction_fromString(TR_Environment* env, const char* str) {
 	retVal->numerator = TR_BigInt_fromString(env,buffer);
 	retVal->denominator = TR_BigInt_fromString(env,pos+1);
 	env->deallocator(buffer);
+
 	return _canonicalize(retVal);
 }
 

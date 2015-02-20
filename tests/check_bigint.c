@@ -241,33 +241,22 @@ END_TEST
 Suite* bigint_suite()
 {
 	Suite *suite;
-	TCase *testCore;
+	TCase *testCore,*testComparisons;
 	
 	suite = suite_create("BigInt");
-	testCore = tcase_create("Core");
-
+	testCore = tcase_create("Operations");
 	tcase_add_test(testCore,bigint_subtract);
 	tcase_add_test(testCore,bigint_add);
 	tcase_add_test(testCore,bigint_init);
-	tcase_add_test(testCore,bigint_compare);
 	tcase_add_test(testCore,bigint_multiply);
 	tcase_add_test(testCore,bigint_divide);
 
+	testComparisons = tcase_create("Comparisons");
+	tcase_add_test(testComparisons,bigint_compare);
+
+	suite_add_tcase(suite,testComparisons);
 	suite_add_tcase(suite,testCore);
 
 	return suite;
 }
 
-int main()
-{
-	int number_failed;
-	Suite *suite;
-	SRunner *suiteRunner;
-
-	suite = bigint_suite();
-	suiteRunner = srunner_create(suite);
-
-	srunner_run_all(suiteRunner,CK_NORMAL);
-	number_failed = srunner_ntests_failed(suiteRunner);
-	return number_failed==0?EXIT_SUCCESS:EXIT_FAILURE;
-}
