@@ -6,7 +6,7 @@
 #define NEGATIVE_CHECK_NUMBER "-1/2"
 #define LARGE_CHECK_NUMBER "1982349823498234/128348923489234"
 
-START_TEST (fraction_init)
+START_TEST (fraction_input_output)
 {
 	TR_Environment *env = TR_Environment_alloc();
 	TR_Fraction* num1 = TR_Fraction_alloc(env);
@@ -26,7 +26,7 @@ START_TEST (fraction_init)
 END_TEST
 
 
-Suite* fraction_suite()
+Suite* test_suite()
 {
 	Suite *suite;
 	TCase *testInit;
@@ -34,7 +34,7 @@ Suite* fraction_suite()
 	suite = suite_create("Fraction");
 	testInit = tcase_create("Init");
 
-	tcase_add_test(testInit,fraction_init);
+	tcase_add_test(testInit,fraction_input_output);
 
 	suite_add_tcase(suite,testInit);
 

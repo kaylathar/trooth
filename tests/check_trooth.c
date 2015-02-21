@@ -6,12 +6,9 @@
 int main()
 {
         int number_failed;
-        Suite *suite;
         SRunner *suiteRunner;
 
-        suite = bigint_suite();
-        suiteRunner = srunner_create(suite);
-	srunner_add_suite(suiteRunner,fraction_suite());
+        suiteRunner = srunner_create(test_suite());
 
         srunner_run_all(suiteRunner,CK_NORMAL);
         number_failed = srunner_ntests_failed(suiteRunner);

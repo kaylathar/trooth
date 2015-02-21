@@ -238,7 +238,7 @@ START_TEST(bigint_divide)
 }
 END_TEST
 
-Suite* bigint_suite()
+Suite* test_suite()
 {
 	Suite *suite;
 	TCase *testCore,*testComparisons;
