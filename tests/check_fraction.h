@@ -1,2 +1,2 @@
 #include <check.h>
-Suite* fraction_suite()
+Suite* fraction_suite();

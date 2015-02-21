@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <check.h>
 #include "check_bigint.h"
+#include "check_fraction.h"
 
 int main()
 {
