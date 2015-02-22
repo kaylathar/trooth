@@ -553,6 +553,30 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
   
 }
 
+TR_BigInt* TR_BigInt_gcd(TR_BigInt* op1, TR_BigInt* op2)
+{
+        TR_BigInt* num1;
+        TR_BigInt* num2;
+	TR_BigInt_DivisionResult* divisionResult;
+        TR_BigInt* zero = TR_BigInt_fromString(op1->environment,"0");
+	/* Ensure correct ordering */
+	if (TR_BigInt_compare(op1,op2) == 1)
+	{
+		return TR_BigInt_gcd(op2,op1);
+	}
+	num1 = TR_BigInt_absolute(op1);
+	num2 = TR_BigInt_absolute(op2);
+	while (TR_BigInt_compare(num1,zero) == 1)
+	{
+		divisionResult = TR_BigInt_divide(num2,num1);
+		TR_BigInt_free(num2);
+		num2 = num1;
+		num1 = divisionResult->remainder;
+		TR_BigInt_DivisionResult_free(divisionResult);
+	}
+	return num2;
+}
+
 /***************************/
 /* DivisionResult Handling */
 /***************************/

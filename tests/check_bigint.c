@@ -27,6 +27,27 @@ START_TEST (bigint_init)
 }
 END_TEST
 
+START_TEST (bigint_gcd)
+{
+	TR_Environment* env = TR_Environment_alloc();
+        TR_BigInt* num1 = TR_BigInt_fromString(env,"12");
+        TR_BigInt* num2 = TR_BigInt_fromString(env,"4");
+        TR_BigInt* num3 = TR_BigInt_fromString(env,"3");
+        TR_BigInt* num4 = TR_BigInt_fromString(env,"8");
+
+	TR_BigInt* result1 = TR_BigInt_gcd(num1,num1);
+	TR_BigInt* result2 = TR_BigInt_gcd(num1,num2);
+	TR_BigInt* result3 = TR_BigInt_gcd(num4,num1);
+	TR_BigInt* result4 = TR_BigInt_gcd(num2,num3);
+
+	ck_assert_str_eq(TR_BigInt_toString(result1),"12");
+	ck_assert_str_eq(TR_BigInt_toString(result2),"4");
+	ck_assert_str_eq(TR_BigInt_toString(result3),"4");
+	ck_assert_str_eq(TR_BigInt_toString(result4),"1");
+	
+}
+END_TEST
+
 START_TEST (bigint_add)
 {
 	TR_Environment* env = TR_Environment_alloc();
@@ -248,6 +269,7 @@ Suite* test_suite()
 	tcase_add_test(testCore,bigint_subtract);
 	tcase_add_test(testCore,bigint_add);
 	tcase_add_test(testCore,bigint_init);
+	tcase_add_test(testCore,bigint_gcd);
 	tcase_add_test(testCore,bigint_multiply);
 	tcase_add_test(testCore,bigint_divide);
 

@@ -103,6 +103,13 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 TR_BigInt* TR_BigInt_absolute(TR_BigInt* operand);
 
 
+/**
+ * Calculates GCD of two numbers, please make no assumptions about algorithm
+ * being used as it is subject to change
+ * @return GCD of the two values given - if no common divisors but 1 exist,
+ * function will return 1
+ */
+TR_BigInt* TR_BigInt_gcd(TR_BigInt* op1, TR_BigInt* op2);
 
 
 /***************/
