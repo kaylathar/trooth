@@ -262,7 +262,7 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 			result->negative = operand1->negative;
 			break;
 		case -1:
-			result->negative = !operand1->negative;
+			result->negative = !(operand2->negative);
 			tmp = operand1;
 			operand1 = operand2;
 			operand2 = tmp;	
@@ -541,7 +541,7 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 		diff = TR_BigInt_compare(remainder,operand2);
 
 	}
-	
+
 	quotient->negative = negative;
 	result = operand1->environment->allocator(sizeof(TR_BigInt_DivisionResult));
 	_canonicalize(quotient);
