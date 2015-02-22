@@ -1,6 +1,7 @@
 #include "Fraction.h"
 #include "util.h"
 #include "Environment_Internal.h"
+#include "BigInt_Internal.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -94,7 +95,16 @@ TR_Fraction* TR_Fraction_add(TR_Fraction* operand1, TR_Fraction* operand2) {
 	return _canonicalize(retVal);
 }
 TR_Fraction* TR_Fraction_subtract(TR_Fraction* operand1, TR_Fraction* operand2) {
-	return 0;
+	/* Should work on cheaper way to compute LCM and use that instead */
+        TR_BigInt* num1 = TR_BigInt_multiply(operand1->numerator,operand2->denominator);
+        TR_BigInt* den = TR_BigInt_multiply(operand1->denominator,operand2->denominator);
+        TR_BigInt* num2 = TR_BigInt_multiply(operand2->numerator,operand1->denominator);
+        TR_Fraction* retVal = TR_Fraction_alloc(operand1->environment);
+        retVal->numerator = TR_BigInt_subtract(num1,num2);
+        retVal->denominator = den;
+        TR_BigInt_free(num1);
+        TR_BigInt_free(num2);
+        return _canonicalize(retVal);
 }
 TR_Fraction* TR_Fraction_multiply(TR_Fraction* operand1, TR_Fraction* operand2) {
 	TR_Fraction* result = TR_Fraction_alloc(operand1->environment);
@@ -118,7 +128,16 @@ TR_Fraction* TR_Fraction_absolute(TR_Fraction* operand) {
 
 TR_Fraction* _canonicalize(TR_Fraction* operand)
 {
-	// Should be implemented to check divisibility and signs	
+	char negative = operand->numerator->negative ^ operand->denominator->negative;
+	TR_BigInt* gcd = TR_BigInt_gcd(operand->numerator,operand->denominator);
+	TR_BigInt_DivisionResult* num = TR_BigInt_divide(operand->numerator,gcd);
+	TR_BigInt_DivisionResult* den = TR_BigInt_divide(operand->denominator,gcd);
+	operand->numerator = TR_BigInt_copy(num->quotient);
+	operand->numerator->negative = negative;
+	operand->denominator = TR_BigInt_copy(den->quotient);
+	TR_BigInt_DivisionResult_free(den);
+	TR_BigInt_DivisionResult_free(num);
+	TR_BigInt_free(gcd);
 	return operand;
 }
 
