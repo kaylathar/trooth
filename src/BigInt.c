@@ -198,16 +198,15 @@ int TR_BigInt_compare(TR_BigInt *operand1, TR_BigInt *operand2)
 		return operand2->negative?1:-1;
 	}
 
-	for (i = operand1->size-1; i >= 0; --i)
+	for (i = 0; i < operand1->size; ++i)
 	{
 		digit1 = operand1->bytes[i];
 		digit2 = operand2->bytes[i];
-
 		if (digit1 > digit2)
 		{
 			return operand1->negative?-1:1;
 		}
-		if (digit2 < digit2)
+		if (digit1 < digit2)
 		{
 			return operand2->negative?1:-1;
 		}	
