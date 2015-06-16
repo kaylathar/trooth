@@ -51,7 +51,6 @@ TR_BigInt* TR_BigInt_copy(TR_BigInt *toCopy)
 /* All of the below util functions operate 'in place' for efficiency */
 static void _pad(TR_BigInt* operand, int toSize)
 {
-	// Caution: this returns a non-canonical representation (which is why it is private)
 	TR_BigInt* result;
 	char* bytes;
 
@@ -231,8 +230,11 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 	TR_BigInt* tmp;
 	TR_BigInt* result = TR_BigInt_alloc(operand1->environment);
 	char* bytes, digit1,digit2,carry = 0;	
+
+	TR_BigInt* op1_absolute = TR_BigInt_absolute(operand1);
+	TR_BigInt* op2_absolute = TR_BigInt_absolute(operand2);
 	
-	switch (TR_BigInt_compare(TR_BigInt_absolute(operand1),TR_BigInt_absolute(operand2)))
+	switch (TR_BigInt_compare(op1_absolute,op2_absolute))
 	{
 		case 0:
 			bytes = operand1->environment->allocator(1);
@@ -250,6 +252,8 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 			operand2 = tmp;	
 			break;
 	}
+	TR_BigInt_free(op1_absolute);
+	TR_BigInt_free(op2_absolute);
 
 	k = operand1->size-1;
 	bytes = operand1->environment->allocator(operand1->size);
@@ -278,9 +282,10 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 	result->bytes = operand1->environment->allocator(size);	
 	memcpy(result->bytes,bytes+i,size);
 	result->size = size;
-	operand1->environment->deallocator(bytes);
+	//operand1->environment->deallocator(bytes);
 	return result;	
 }
+
 
 TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 {
@@ -288,9 +293,10 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 	TR_BigInt* result = TR_BigInt_alloc(operand1->environment);
 	char subtract = operand1->negative ^ operand2->negative;
 	char digit1,digit2,carry;
-	size = MAX(operand1->size,operand2->size);
 	char* bytes;
-	
+
+	/* Max size cannot exceed 1 + max numeral size */	
+	size = MAX(operand1->size,operand2->size);
 	size += 1;
 
 	bytes = operand1->environment->allocator(size);
@@ -315,12 +321,16 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 
 	memcpy(result->bytes,bytes,size);
 
-	//operand1->environment->deallocator(bytes);
+	operand1->environment->deallocator(bytes);
 
 	_canonicalize(result);
 	return result;
 }
 
+/**
+ * Performs naive multiplication algorithm
+ * O(n^2) - will return result and is non-destructive
+ */
 static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 {
 	int i,j,k;
@@ -329,8 +339,16 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 	int carry,realsize;
 
 	negative = operand1->negative ^ operand2->negative;
+
+	/* The size of the result should never exceed 2 * max of sizes
+	 * or to put another way, if you multiple a number by itself, the
+	 * worst case is the number by itself, and worst case of this is a
+	 * number of form (10^n)-1 - where n is number of digits - our claim
+	 * is that in that case, we can guarantee result is 2n or fewer digits
+	 */ 	
+	int size = 2*MAX(operand1->size,operand2->size);
 	
-	int size = 2*(operand1->size>operand2->size?operand1->size:operand2->size);
+	/* We will use realsize to track the actual size of result */
 	realsize = size;
 	bytes = operand1->environment->allocator(size);
 	memset(bytes,0,size);
@@ -365,11 +383,13 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 	result->size = realsize;
 	result->bytes = result->environment->allocator(result->size);
 	memcpy(result->bytes,bytes+(size-realsize),realsize);
-	//operand1->environment->deallocator(bytes);
+	operand1->environment->deallocator(bytes);
 	_canonicalize(result);
 	return result;
 }
 
+/* A safe power function for use in karatsuba - makes assumptions therein
+ * so should not be used for any other power operations */
 static TR_BigInt* _karatsuba_safe_power(TR_Environment* env,int expo)
 {
 	// Is safe to use int for expo since it is used for size, it won't overflow
@@ -384,6 +404,14 @@ static TR_BigInt* _karatsuba_safe_power(TR_Environment* env,int expo)
 		
 }
 
+/* Performs a karatsuba multiplication on inputs, falls back
+ * to naive multiplication as the base case, will automatically
+ * pad inputs correctly to apply algorithm
+ * 
+ * At some point we should provide a proof for this since the
+ * "how is a clock accurate if you only measure it by other clocks"
+ * argument has some credence for more complex algorithms like this
+ */
 static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 {
 	int maxSize,midpoint,expo;
@@ -410,6 +438,10 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 
 	maxSize = operand1->size;
 	midpoint = maxSize/2;
+
+	/* It isn't all that important how we do this as long as we
+	 * are consistent 
+	 */
 	expo = maxSize%2==0?midpoint:midpoint+1;
 
 	
@@ -472,6 +504,8 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	TR_BigInt_free(int1);
 	TR_BigInt_free(int2);
 	TR_BigInt_free(int3);
+	TR_BigInt_free(combined1);
+	TR_BigInt_free(combined2);
 
 	result->negative = negative;
 	
@@ -483,7 +517,9 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
 {
 
-	// ~ 12 is when Karatsuba's exceeds performance of naive multiplication
+	/* ~ 12 is when Karatsuba's exceeds performance of naive multiplication
+	 * for radix of 10 
+	 */
 	if (MAX(operand1->size, operand2->size) > 11)
 	{
 		return _multiply_karatsuba(operand1,operand2);
@@ -494,7 +530,9 @@ TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
 
 TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* operand2)
 {
-	// Naive division algorithm
+	/* Naive division algorithm - very slow
+	 * should rework it into a better integer division algorithm
+	 */
 	TR_BigInt *quotient, *remainder,*one,*zero,*tmp;
 	TR_BigInt_DivisionResult* result;
 	int diff;
@@ -530,17 +568,18 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 	result->quotient = quotient;
 	_canonicalize(remainder);
 	result->remainder = remainder;
-	
+
+	TR_BigInt_free(one);	
 	return result;
   
 }
 
 TR_BigInt* TR_BigInt_gcd(TR_BigInt* op1, TR_BigInt* op2)
 {
-        TR_BigInt* num1;
-        TR_BigInt* num2;
+        TR_BigInt* num1,*num2;
 	TR_BigInt_DivisionResult* divisionResult;
         TR_BigInt* zero = TR_BigInt_fromString(op1->environment,"0");
+
 	/* Ensure correct ordering */
 	if (TR_BigInt_compare(op1,op2) == 1)
 	{
@@ -554,8 +593,11 @@ TR_BigInt* TR_BigInt_gcd(TR_BigInt* op1, TR_BigInt* op2)
 		TR_BigInt_free(num2);
 		num2 = num1;
 		num1 = divisionResult->remainder;
+		TR_BigInt_free(divisionResult->quotient);
 		TR_BigInt_DivisionResult_free(divisionResult);
 	}
+	TR_BigInt_free(num1);
+	TR_BigInt_free(zero);
 	return num2;
 }
 
