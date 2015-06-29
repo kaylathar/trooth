@@ -40,7 +40,7 @@ TR_Fraction* TR_Fraction_copy(TR_Fraction *toCopy) {
 	return retVal;
 }
 
-TR_Fraction* TR_Fraction_free(TR_Fraction *toFree) {
+void TR_Fraction_free(TR_Fraction *toFree) {
 	if (toFree->numerator)
 	{
 		TR_BigInt_free(toFree->numerator);

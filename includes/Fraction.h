@@ -6,7 +6,7 @@ struct TR_Fraction;
 typedef struct TR_Fraction TR_Fraction;
 
 TR_Fraction* TR_Fraction_copy(TR_Fraction *toCopy);
-TR_Fraction* TR_Fraction_free(TR_Fraction *toFree);
+void TR_Fraction_free(TR_Fraction *toFree);
 char* TR_Fraction_toString(TR_Fraction *fraction);
 TR_Fraction* TR_Fraction_fromString(TR_Environment* env, const char* str);
 
