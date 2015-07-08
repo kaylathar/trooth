@@ -1,4 +1,4 @@
-#include "trooth/Fraction.h"
+#include "trooth/fraction.h"
 #include <stdlib.h>
 #include <check.h>
 #include <stdio.h>

@@ -1,7 +1,7 @@
 #ifndef ENVIRONMENT_INTERNAL_H
 #define ENVIRONMENT_INTERNAL_H
-#include "trooth/Environment.h"
-#include "trooth/BigInt.h"
+#include "trooth/environment.h"
+#include "trooth/bigint.h"
 #include <stdlib.h>
 
 /* Callback defs */

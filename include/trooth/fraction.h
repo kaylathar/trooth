@@ -1,6 +1,6 @@
 #ifndef FRACTION_H
 #define FRACTION_H
-#include "BigInt.h"
+#include "trooth/bigint.h"
 
 struct TR_Fraction;
 typedef struct TR_Fraction TR_Fraction;

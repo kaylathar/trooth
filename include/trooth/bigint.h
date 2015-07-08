@@ -1,6 +1,6 @@
 #ifndef BIGINT_H
 #define BIGINT_H
-#include "Environment.h"
+#include "trooth/environment.h"
 
 /**
  * TR_BigInt represents a big-integer object, it is immutable
