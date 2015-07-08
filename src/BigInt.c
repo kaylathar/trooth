@@ -1,7 +1,7 @@
-#include "BigInt.h"
-#include "util.h"
-#include "Environment_Internal.h"
-#include "BigInt_Internal.h"
+#include "trooth/bigint.h"
+#include "trooth/util_internal.h"
+#include "trooth/environment_internal.h"
+#include "trooth/bigint_internal.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

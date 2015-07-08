@@ -1,4 +1,4 @@
-#include "BigInt.h"
+#include "trooth/BigInt.h"
 #include <stdlib.h>
 #include <check.h>
 

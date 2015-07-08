@@ -1,5 +1,5 @@
-#include "Environment_Internal.h"
-#include "util.h"
+#include "trooth/environment_internal.h"
+#include "trooth/util_internal.h"
 
 /********************/
 /* Callback defines */
