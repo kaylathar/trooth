@@ -1,6 +1,6 @@
 AC_INIT(trooth, 0.1, kayla@kayla.is)
 AC_CONFIG_AUX_DIR(config)
-AC_CONFIG_SRCDIR(src/BigInt.c)
+AC_CONFIG_SRCDIR(src/bigint.c)
 
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
