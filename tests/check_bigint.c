@@ -108,6 +108,12 @@ START_TEST (bigint_subtract)
         ck_assert_str_eq(TR_BigInt_toString(result3),"-1222");
         ck_assert_str_eq(TR_BigInt_toString(result4),"1222");
 
+	// Test negative/positive
+        TR_BigInt* result5 = TR_BigInt_subtract(num1,num4);
+        TR_BigInt* result6 = TR_BigInt_subtract(num4,num1);
+        ck_assert_str_eq(TR_BigInt_toString(result5),"1246");
+        ck_assert_str_eq(TR_BigInt_toString(result6),"-1246");	
+
         TR_BigInt_free(num1);
         TR_BigInt_free(num2);
 	TR_BigInt_free(num3);
@@ -116,6 +122,8 @@ START_TEST (bigint_subtract)
 	TR_BigInt_free(result2);
 	TR_BigInt_free(result3);
 	TR_BigInt_free(result4);
+	TR_BigInt_free(result5);
+	TR_BigInt_free(result6);
 	TR_Environment_free(env);
 
 }

@@ -228,8 +228,19 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 {
 	int i,j,k,size;
 	TR_BigInt* tmp;
+	TR_BigInt *absVal, *tmpVal;
 	TR_BigInt* result = TR_BigInt_alloc(operand1->environment);
-	char* bytes, digit1,digit2,carry = 0;
+	char* bytes,digit1,digit2,carry = 0;
+
+	if (operand1->negative ^ operand2->negative)
+	{
+			absVal = TR_BigInt_copy(operand2);
+			absVal->negative = operand1->negative;
+			tmpVal = TR_BigInt_add(operand1,absVal);
+			TR_BigInt_free(absVal);
+			return tmpVal;
+
+	}
 
 	TR_BigInt* op1_absolute = TR_BigInt_absolute(operand1);
 	TR_BigInt* op2_absolute = TR_BigInt_absolute(operand2);
@@ -302,7 +313,7 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 		neg = operand1->negative?operand1:operand2;
 		pos = operand1->negative?operand2:operand1;
 		absVal = TR_BigInt_absolute(neg);
-		tmpVal = TR_BigInt_subtract(pos,neg);
+		tmpVal = TR_BigInt_subtract(pos,absVal);
 		TR_BigInt_free(absVal);
 		return tmpVal;
 	}
