@@ -33,7 +33,7 @@ void TR_BigInt_free(TR_BigInt *number)
 TR_BigInt* TR_BigInt_copy(TR_BigInt *toCopy)
 {
 	TR_BigInt* result = TR_BigInt_alloc(toCopy->environment);
-	result->negative = toCopy->negative; 
+	result->negative = toCopy->negative;
 	result->size = toCopy->size;
 	result->bytes = toCopy->environment->allocator(result->size);
 	memcpy(result->bytes,toCopy->bytes,toCopy->size);
@@ -60,7 +60,7 @@ static void _pad(TR_BigInt* operand, int toSize)
 
 		memset(bytes,0,toSize);
 		memcpy(bytes+(toSize-operand->size),operand->bytes,operand->size);
-		
+
 		operand->environment->deallocator(operand->bytes);
 		operand->size = toSize;
 		operand->bytes = bytes;
@@ -73,14 +73,14 @@ static void _canonicalize(TR_BigInt* operand)
 {
 	int i;
 	char *bytes;
-	
+
 	/* Only one zero representation */
 	if (operand->size == 1 && operand->bytes[0] == 0)
 	{
 	  operand->negative = 0;
 	  return;
 	}
-	
+
 	/* no leading zeros */
 	for (i = 0; i < operand->size; ++i)
         {
@@ -98,7 +98,7 @@ static void _canonicalize(TR_BigInt* operand)
 	operand->environment->deallocator(operand->bytes);
 	operand->bytes = bytes;
 	operand->size = operand->size-i;
-	
+
 }
 
 
@@ -121,13 +121,13 @@ TR_BigInt* TR_BigInt_fromString(TR_Environment* env,const char* str)
 	}
 
 	number->size = strlen(cur);
-	number->bytes = env->allocator(number->size);	
+	number->bytes = env->allocator(number->size);
 	while (*cur != '\0')
 	{
-		number->bytes[i++] = *(cur++) - '0';	
+		number->bytes[i++] = *(cur++) - '0';
 	}
 
-	return number;	
+	return number;
 }
 
 char* TR_BigInt_toString(TR_BigInt *number)
@@ -138,15 +138,15 @@ char* TR_BigInt_toString(TR_BigInt *number)
 
 	if (number->negative)
 		size++;
-	
+
 	buf = number->environment->allocator((size+1));
 	origin = buf;
 	if (number->negative)
 	{
-		buf[0] = '-';		
+		buf[0] = '-';
 		buf++;
 	}
-	
+
 	while (i < number->size)
 	{
 		buf[i] = number->bytes[i] + '0';
@@ -190,8 +190,8 @@ int TR_BigInt_compare(TR_BigInt *operand1, TR_BigInt *operand2)
 		if (digit1 < digit2)
 		{
 			return operand2->negative?1:-1;
-		}	
-	}	
+		}
+	}
 
 	return 0;
 }
@@ -229,11 +229,11 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 	int i,j,k,size;
 	TR_BigInt* tmp;
 	TR_BigInt* result = TR_BigInt_alloc(operand1->environment);
-	char* bytes, digit1,digit2,carry = 0;	
+	char* bytes, digit1,digit2,carry = 0;
 
 	TR_BigInt* op1_absolute = TR_BigInt_absolute(operand1);
 	TR_BigInt* op2_absolute = TR_BigInt_absolute(operand2);
-	
+
 	switch (TR_BigInt_compare(op1_absolute,op2_absolute))
 	{
 		case 0:
@@ -249,7 +249,7 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 			result->negative = !(operand2->negative);
 			tmp = operand1;
 			operand1 = operand2;
-			operand2 = tmp;	
+			operand2 = tmp;
 			break;
 	}
 	TR_BigInt_free(op1_absolute);
@@ -268,7 +268,7 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 			carry = 1;
 		}
 		else
-		{	
+		{
 			bytes[k] = digit1 - digit2 - carry;
 			carry = 0;
 		}
@@ -279,23 +279,37 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 			break;
 	}
 	size = operand1->size - i;
-	result->bytes = operand1->environment->allocator(size);	
+	result->bytes = operand1->environment->allocator(size);
 	memcpy(result->bytes,bytes+i,size);
 	result->size = size;
 	//operand1->environment->deallocator(bytes);
-	return result;	
+	return result;
 }
 
 
 TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 {
 	int i,j,k,size;
-	TR_BigInt* result = TR_BigInt_alloc(operand1->environment);
+	TR_BigInt* result;
+	TR_BigInt *neg,*pos,*absVal,*tmpVal;
 	char subtract = operand1->negative ^ operand2->negative;
 	char digit1,digit2,carry;
 	char* bytes;
 
-	/* Max size cannot exceed 1 + max numeral size */	
+	/* Handle if this is actually subtraction */
+	if (subtract)
+	{
+		neg = operand1->negative?operand1:operand2;
+		pos = operand1->negative?operand2:operand1;
+		absVal = TR_BigInt_absolute(neg);
+		tmpVal = TR_BigInt_subtract(pos,neg);
+		TR_BigInt_free(absVal);
+		return tmpVal;
+	}
+
+	result = TR_BigInt_alloc(operand1->environment);
+
+	/* Max size cannot exceed 1 + max numeral size */
 	size = MAX(operand1->size,operand2->size);
 	size += 1;
 
@@ -303,7 +317,7 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 	memset(bytes,0,size);
 	k = size-1;
 
-	
+
 
 	for (i=operand1->size-1,j=operand2->size-1,carry=0;i >= 0 || j >= 0 || carry > 0;)
 	{
@@ -311,7 +325,7 @@ TR_BigInt* TR_BigInt_add(TR_BigInt *operand1, TR_BigInt *operand2)
 		digit2 = j>=0?operand2->bytes[j--]:0;
 		carry += digit1+digit2;
 		bytes[k--] = carry % 10;
-		carry /= 10;			
+		carry /= 10;
 	}
 
 
@@ -345,9 +359,9 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 	 * worst case is the number by itself, and worst case of this is a
 	 * number of form (10^n)-1 - where n is number of digits - our claim
 	 * is that in that case, we can guarantee result is 2n or fewer digits
-	 */ 	
+	 */
 	int size = 2*MAX(operand1->size,operand2->size);
-	
+
 	/* We will use realsize to track the actual size of result */
 	realsize = size;
 	bytes = operand1->environment->allocator(size);
@@ -362,7 +376,7 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 		{
 			if (j >= 0)
 			{
-				carry += (operand1->bytes[i] * operand2->bytes[j]);	
+				carry += (operand1->bytes[i] * operand2->bytes[j]);
 			}
 			bytes[k] += carry;
 			carry = bytes[k] / 10;
@@ -371,7 +385,7 @@ static TR_BigInt* _multiply_naive(TR_BigInt* operand1, TR_BigInt* operand2)
 			{
 				realsize = k;
 			}
-			--k;	
+			--k;
 		}
 
 	}
@@ -401,13 +415,13 @@ static TR_BigInt* _karatsuba_safe_power(TR_Environment* env,int expo)
 	tmp = TR_BigInt_fromString(env,result);
 	env->deallocator(result);
 	return tmp;
-		
+
 }
 
 /* Performs a karatsuba multiplication on inputs, falls back
  * to naive multiplication as the base case, will automatically
  * pad inputs correctly to apply algorithm
- * 
+ *
  * At some point we should provide a proof for this since the
  * "how is a clock accurate if you only measure it by other clocks"
  * argument has some credence for more complex algorithms like this
@@ -419,12 +433,12 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	char negative;
 	negative = operand1->negative ^ operand2->negative;
 
-	
+
 	if (operand1->size < 2 || operand2->size < 2)
 	{
 		return _multiply_naive(operand1,operand2);
 	}
-	
+
 	// Equalize operands
 	if (operand2->size > operand1->size)
 	{
@@ -433,24 +447,24 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	else if (operand2->size < operand1->size)
 	{
 		_pad(operand2,operand1->size);
-	}		
+	}
 
 
 	maxSize = operand1->size;
 	midpoint = maxSize/2;
 
 	/* It isn't all that important how we do this as long as we
-	 * are consistent 
+	 * are consistent
 	 */
 	expo = maxSize%2==0?midpoint:midpoint+1;
 
-	
-	TR_Environment* env = operand1->environment;	
+
+	TR_Environment* env = operand1->environment;
 	highOp1 = TR_BigInt_alloc(env);
 	highOp2 = TR_BigInt_alloc(env);
 	lowOp1 = TR_BigInt_alloc(env);
 	lowOp2 = TR_BigInt_alloc(env);
-	
+
 	highOp1->size = midpoint;
 	highOp2->size = midpoint;
 	lowOp1->size = operand1->size - midpoint;
@@ -484,7 +498,7 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	tmp = _karatsuba_safe_power(env,2*expo);
 	result = _multiply_naive(int3,tmp);
 	TR_BigInt_free(tmp);
-		
+
 	tmp = _karatsuba_safe_power(env,expo);
 	combined1 = TR_BigInt_subtract(int2,int3);
 	combined2 = TR_BigInt_subtract(combined1,int1);
@@ -492,15 +506,15 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	combined1 = _multiply_naive(combined2,tmp);
 
 	TR_BigInt_free(tmp);
-	
+
 	tmp = TR_BigInt_add(result,combined1);
 	TR_BigInt_free(result);
 	result = tmp;
-	
+
 	tmp = TR_BigInt_add(result,int1);
 	TR_BigInt_free(result);
 	result = tmp;
-	
+
 	TR_BigInt_free(int1);
 	TR_BigInt_free(int2);
 	TR_BigInt_free(int3);
@@ -508,9 +522,9 @@ static TR_BigInt* _multiply_karatsuba(TR_BigInt* operand1, TR_BigInt* operand2)
 	TR_BigInt_free(combined2);
 
 	result->negative = negative;
-	
+
 	_canonicalize(result);
-	
+
 	return result;
 }
 
@@ -518,7 +532,7 @@ TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
 {
 
 	/* ~ 12 is when Karatsuba's exceeds performance of naive multiplication
-	 * for radix of 10 
+	 * for radix of 10
 	 */
 	if (MAX(operand1->size, operand2->size) > 11)
 	{
@@ -537,7 +551,7 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 	TR_BigInt_DivisionResult* result;
 	int diff;
 	char negative;
-	
+
 	one = TR_BigInt_fromString(operand1->environment,"1");
 	zero = TR_BigInt_fromString(operand1->environment,"0");
 	quotient = zero;
@@ -553,11 +567,11 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 		tmp = TR_BigInt_add(quotient,one);
 		TR_BigInt_free(quotient);
 		quotient = tmp;
-		
+
 		tmp = TR_BigInt_subtract(remainder,operand2);
 		TR_BigInt_free(remainder);
 		remainder = tmp;
-		
+
 		diff = TR_BigInt_compare(remainder,operand2);
 
 	}
@@ -569,9 +583,9 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 	_canonicalize(remainder);
 	result->remainder = remainder;
 
-	TR_BigInt_free(one);	
+	TR_BigInt_free(one);
 	return result;
-  
+
 }
 
 TR_BigInt* TR_BigInt_gcd(TR_BigInt* op1, TR_BigInt* op2)
@@ -618,6 +632,3 @@ TR_BigInt* TR_BigInt_DivisionResult_quotient(TR_BigInt_DivisionResult* result)
 {
   	return result->quotient;
 }
-
-
-
