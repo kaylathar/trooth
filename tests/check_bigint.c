@@ -71,19 +71,26 @@ START_TEST (bigint_add)
 	// Test negative/positive
 	TR_BigInt* result5 = TR_BigInt_add(num1,num4);
 	TR_BigInt* result6 = TR_BigInt_add(num4,num1);
+	TR_BigInt* result7 = TR_BigInt_add(num1,num2);
+	TR_BigInt* result8 = TR_BigInt_add(num1,num2);
 	ck_assert_str_eq(TR_BigInt_toString(result5),"1222");
 	ck_assert_str_eq(TR_BigInt_toString(result6),"1222");
+	ck_assert_str_eq(TR_BigInt_toString(result7),"0");
+	ck_assert_str_eq(TR_BigInt_toString(result8),"0");
+
 
 	TR_BigInt_free(num1);
 	TR_BigInt_free(num2);
 	TR_BigInt_free(num3);
 	TR_BigInt_free(num4);
-        TR_BigInt_free(result1);
-        TR_BigInt_free(result2);
-        TR_BigInt_free(result3);
-        TR_BigInt_free(result4);
-        TR_BigInt_free(result5);
-        TR_BigInt_free(result6);
+  TR_BigInt_free(result1);
+  TR_BigInt_free(result2);
+  TR_BigInt_free(result3);
+  TR_BigInt_free(result4);
+  TR_BigInt_free(result5);
+  TR_BigInt_free(result6);
+	TR_BigInt_free(result7);
+	TR_BigInt_free(result8);
 	TR_Environment_free(env);
 }
 END_TEST
@@ -112,7 +119,7 @@ START_TEST (bigint_subtract)
         TR_BigInt* result5 = TR_BigInt_subtract(num1,num4);
         TR_BigInt* result6 = TR_BigInt_subtract(num4,num1);
         ck_assert_str_eq(TR_BigInt_toString(result5),"1246");
-        ck_assert_str_eq(TR_BigInt_toString(result6),"-1246");	
+        ck_assert_str_eq(TR_BigInt_toString(result6),"-1246");
 
         TR_BigInt_free(num1);
         TR_BigInt_free(num2);
@@ -258,7 +265,7 @@ START_TEST(bigint_divide)
 	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result4)),"12");
 
 	// pos/neg
-	TR_BigInt_DivisionResult *result5 = TR_BigInt_divide(num1,num4);	
+	TR_BigInt_DivisionResult *result5 = TR_BigInt_divide(num1,num4);
 	TR_BigInt_DivisionResult *result6 = TR_BigInt_divide(num4,num1);
 	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_quotient(result5)),"-100");
 	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result5)),"0");
