@@ -14,9 +14,13 @@ void TR_free(void* ptr)
 void* TR_alloc(size_t size)
 {
       void* result =  malloc(size);
-      
-      // Add to our in-use list
-      
+      if (!result)
+      {
+        fprintf(stderr,"TROOTH: Failed to allocate memory");
+        abort();
+      }
+      memset(result,0,size);
+
       return result;
 }
 
@@ -36,7 +40,3 @@ void TR_Environment_free(TR_Environment* env)
 {
 	free(env);
 }
-
-	
-
-
