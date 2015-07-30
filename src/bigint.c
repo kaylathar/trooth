@@ -420,7 +420,7 @@ static TR_BigInt* _karatsuba_safe_power(TR_Environment* env,int expo)
 	// Is safe to use int for expo since it is used for size, it won't overflow
 	TR_BigInt* tmp;
 	char* result = env->allocator(expo+1);
-	memset(result,'0',expo+2);
+	memset(result,'0',expo+1);
 	result[0] = '1';
 	result[expo+1] = '\0';
 	tmp = TR_BigInt_fromString(env,result);
