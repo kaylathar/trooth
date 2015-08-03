@@ -588,7 +588,8 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 	}
 
 	quotient->negative = negative;
-	result = operand1->environment->allocator(sizeof(TR_BigInt_DivisionResult));
+	result = (operand1->environment->allocator(sizeof(TR_BigInt_DivisionResult)));
+	result->environment = operand1->environment;
 	_canonicalize(quotient);
 	result->quotient = quotient;
 	_canonicalize(remainder);
@@ -601,9 +602,9 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 
 TR_BigInt* TR_BigInt_gcd(TR_BigInt* op1, TR_BigInt* op2)
 {
-        TR_BigInt* num1,*num2;
+  TR_BigInt* num1,*num2;
 	TR_BigInt_DivisionResult* divisionResult;
-        TR_BigInt* zero = TR_BigInt_fromString(op1->environment,"0");
+  TR_BigInt* zero = TR_BigInt_fromString(op1->environment,"0");
 
 	/* Ensure correct ordering */
 	if (TR_BigInt_compare(op1,op2) == 1)
@@ -631,7 +632,7 @@ TR_BigInt* TR_BigInt_gcd(TR_BigInt* op1, TR_BigInt* op2)
 /***************************/
 void TR_BigInt_DivisionResult_free(TR_BigInt_DivisionResult* toFree)
 {
-	toFree->environment->deallocator(toFree);
+		toFree->environment->deallocator(toFree);
 }
 
 TR_BigInt* TR_BigInt_DivisionResult_remainder(TR_BigInt_DivisionResult* result)

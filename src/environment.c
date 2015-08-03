@@ -19,7 +19,6 @@ void* TR_alloc(size_t size)
         fprintf(stderr,"TROOTH: Failed to allocate memory");
         abort();
       }
-      memset(result,0,size);
 
       return result;
 }
