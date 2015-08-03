@@ -1,5 +1,6 @@
 #include "trooth/environment_internal.h"
 #include "trooth/util_internal.h"
+#include <stdio.h>
 
 /********************/
 /* Callback defines */
