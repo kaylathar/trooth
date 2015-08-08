@@ -7,15 +7,21 @@
 #define POSITIVE_CHECK_NUMBER2 "1/4"
 #define POSITIVE_CHECK_NUMBER3 "4/1"
 #define NEGATIVE_CHECK_NUMBER "-1/2"
+#define NEGATIVE_DOUBLE_CHECK_NUMBER "-1/-2"
+#define NEGATIVE_NORMALIZE_CHECK_NUMBER "1/-2"
 
 START_TEST (fraction_input_output)
 {
 	TR_Environment *env = TR_Environment_alloc();
 	TR_Fraction* num2 = TR_Fraction_fromString(env,POSITIVE_CHECK_NUMBER);
 	TR_Fraction* num3 = TR_Fraction_fromString(env,NEGATIVE_CHECK_NUMBER);
+	TR_Fraction* num4 = TR_Fraction_fromString(env,NEGATIVE_DOUBLE_CHECK_NUMBER);
+	TR_Fraction* num5 = TR_Fraction_fromString(env,NEGATIVE_NORMALIZE_CHECK_NUMBER);
 	
 	ck_assert_str_eq(TR_Fraction_toString(num2),POSITIVE_CHECK_NUMBER);
 	ck_assert_str_eq(TR_Fraction_toString(num3),NEGATIVE_CHECK_NUMBER);
+	ck_assert_str_eq(TR_Fraction_toString(num4),"1/2");
+	ck_assert_str_eq(TR_Fraction_toString(num5),"-1/2");
 	
 	TR_Fraction_free(num2);
 	TR_Fraction_free(num3);

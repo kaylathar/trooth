@@ -135,6 +135,7 @@ TR_Fraction* _canonicalize(TR_Fraction* operand)
 	operand->numerator = TR_BigInt_copy(num->quotient);
 	operand->numerator->negative = negative;
 	operand->denominator = TR_BigInt_copy(den->quotient);
+	operand->denominator->negative = 0;
 	TR_BigInt_DivisionResult_free(den);
 	TR_BigInt_DivisionResult_free(num);
 	TR_BigInt_free(gcd);
