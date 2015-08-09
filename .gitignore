@@ -8,4 +8,6 @@ config.*
 tests/*.log
 tests/*.trs
 tests/check_bigint
-tests/check_fraction
+tests/check_rational
+.DS_Store
+README
