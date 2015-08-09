@@ -133,7 +133,7 @@ am__v_AR_1 =
 libtrooth_a_AR = $(AR) $(ARFLAGS)
 libtrooth_a_LIBADD =
 am_libtrooth_a_OBJECTS = bigint.$(OBJEXT) environment.$(OBJEXT) \
-	fraction.$(OBJEXT)
+	rational.$(OBJEXT)
 libtrooth_a_OBJECTS = $(am_libtrooth_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -284,7 +284,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -I$(top_srcdir)/include -fPIC
 lib_LIBRARIES = libtrooth.a
-libtrooth_a_SOURCES = bigint.c environment.c fraction.c
+libtrooth_a_SOURCES = bigint.c environment.c rational.c
 all: all-am
 
 .SUFFIXES:
@@ -363,7 +363,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bigint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/environment.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fraction.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rational.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
