@@ -9,10 +9,11 @@ TR_Rational* TR_Rational_copy(TR_Rational *toCopy);
 void TR_Rational_free(TR_Rational *toFree);
 char* TR_Rational_toString(TR_Rational *rational);
 TR_Rational* TR_Rational_fromString(TR_Environment* env, const char* str);
+TR_Rational* TR_Rational_fromIntegers(TR_BigInt* numerator, TR_BigInt* denominator);
 
 TR_Rational* TR_Rational_add(TR_Rational* operand1, TR_Rational* operand2);
-TR_Rational* TR_Rational_subtract(TR_Rational* operand1, TR_Rational* operand2);
 TR_Rational* TR_Rational_multiply(TR_Rational* operand1, TR_Rational* operand2);
+TR_Rational* TR_Rational_subtract(TR_Rational* operand1, TR_Rational* operand2);
 TR_Rational* TR_Rational_divide(TR_Rational* operand1, TR_Rational* operand2);
 TR_Rational* TR_Rational_absolute(TR_Rational* operand);
 

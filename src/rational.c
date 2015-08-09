@@ -65,6 +65,15 @@ char* TR_Rational_toString(TR_Rational *rational) {
 	rational->environment->deallocator(denominator);
 	return result;
 }
+
+TR_Rational* TR_Rational_fromIntegers(TR_BigInt* numerator, TR_BigInt* denominator)
+{
+	TR_Rational* retVal = TR_Rational_alloc(numerator->environment);
+	retVal->numerator = TR_BigInt_copy(numerator);
+	retVal->denominator = TR_BigInt_copy(denominator);
+	return _canonicalize(retVal);
+}
+
 TR_Rational* TR_Rational_fromString(TR_Environment* env, const char* str) {
 	TR_Rational* retVal = TR_Rational_alloc(env);
 	char* buffer = env->allocator(strlen(str)+1);
