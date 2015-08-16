@@ -1,6 +1,6 @@
 #ifndef POLYNOMIAL_H
 #define POLYNOMIAL_H
-#include "trooth/number_internal.h"
+#include "trooth/number.h"
 
 struct TR_Polynomial;
 typedef struct TR_Polynomial TR_Polynomial;

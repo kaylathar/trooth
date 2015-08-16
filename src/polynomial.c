@@ -46,6 +46,11 @@ void TR_Polynomial_free(TR_Polynomial *toFree) {
 	}
 }
 
+static void _canonicalize(TR_Polynomial *polynomial)
+{
+
+}
+
 char* TR_Polynomial_toString(TR_Polynomial *polynomial) {
 	return NULL;
 }

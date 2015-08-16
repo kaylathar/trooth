@@ -1,4 +1,5 @@
 #include "trooth/rational.h"
+#include "trooth/rational_internal.h"
 #include "trooth/util_internal.h"
 #include "trooth/environment_internal.h"
 #include "trooth/bigint_internal.h"
@@ -6,13 +7,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-
-struct TR_Rational
-{
-	TR_BigInt* numerator;
-	TR_BigInt* denominator;
-	TR_Environment* environment;
-};
 
 TR_Rational* _canonicalize(TR_Rational* operand);
 

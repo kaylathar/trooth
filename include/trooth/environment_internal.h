@@ -9,7 +9,7 @@ typedef void* (*TR_Internal_Alloc)(size_t size);
 typedef void (*TR_Internal_Free)(void* block);
 
 /* Environment defines important callbacks for parallelism and other platform
- * specific features 
+ * specific features
  */
 struct TR_Environment
 {
