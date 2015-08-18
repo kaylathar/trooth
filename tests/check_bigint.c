@@ -15,11 +15,11 @@ START_TEST (bigint_init)
 	TR_BigInt* num2 = TR_BigInt_fromString(env,POSITIVE_CHECK_NUMBER);
 	TR_BigInt* num3 = TR_BigInt_fromString(env,NEGATIVE_CHECK_NUMBER);
 	TR_BigInt* num4 = TR_BigInt_fromString(env,LARGE_CHECK_NUMBER);
-	
+
 	ck_assert_str_eq(TR_BigInt_toString(num2),POSITIVE_CHECK_NUMBER);
 	ck_assert_str_eq(TR_BigInt_toString(num3),NEGATIVE_CHECK_NUMBER);
 	ck_assert_str_eq(TR_BigInt_toString(num4),LARGE_CHECK_NUMBER);
-	
+
 	TR_BigInt_free(num1);
 	TR_BigInt_free(num2);
 	TR_BigInt_free(num3);
@@ -44,7 +44,7 @@ START_TEST (bigint_gcd)
 	ck_assert_str_eq(TR_BigInt_toString(result2),"4");
 	ck_assert_str_eq(TR_BigInt_toString(result3),"4");
 	ck_assert_str_eq(TR_BigInt_toString(result4),"1");
-	
+
 }
 END_TEST
 
@@ -148,7 +148,7 @@ START_TEST (bigint_compare)
 	// Test positive/positive
 	ck_assert_int_eq(TR_BigInt_compare(num2,num4),-1);
 	ck_assert_int_eq(TR_BigInt_compare(num4,num2),1);
-	
+
 	// Test equality and idempotency
 	ck_assert_int_eq(TR_BigInt_compare(num4,num4),0);
 	ck_assert_int_eq(TR_BigInt_compare(num4,num5),0);
@@ -201,7 +201,7 @@ START_TEST(bigint_multiply)
 	TR_BigInt *result2 = TR_BigInt_multiply(num1,num3);
 	ck_assert(TR_BigInt_equal(result1,result2));
 	ck_assert_str_eq(TR_BigInt_toString(result1),"1476");
-	
+
 
 	// neg/neg
 	TR_BigInt *result3 = TR_BigInt_multiply(num2,num4);
@@ -210,7 +210,7 @@ START_TEST(bigint_multiply)
 	ck_assert_str_eq(TR_BigInt_toString(result3),"1476");
 
 	// pos/neg
-	TR_BigInt *result5 = TR_BigInt_multiply(num1,num4);	
+	TR_BigInt *result5 = TR_BigInt_multiply(num1,num4);
 	TR_BigInt *result6 = TR_BigInt_multiply(num4,num1);
 	ck_assert(TR_BigInt_equal(result5,result6));
 	ck_assert_str_eq(TR_BigInt_toString(result5),"-1476");
@@ -285,13 +285,15 @@ END_TEST
 Suite* test_suite()
 {
 	Suite *suite;
-	TCase *testCore,*testComparisons;
-	
+	TCase *testCore,*testComparisons,*testInit;
+
 	suite = suite_create("BigInt");
+	testInit = tcase_create("Initialization");
+	tcase_add_test(testInit,bigint_init);
+
 	testCore = tcase_create("Operations");
 	tcase_add_test(testCore,bigint_subtract);
 	tcase_add_test(testCore,bigint_add);
-	tcase_add_test(testCore,bigint_init);
 	tcase_add_test(testCore,bigint_gcd);
 	tcase_add_test(testCore,bigint_multiply);
 	tcase_add_test(testCore,bigint_divide);
@@ -299,9 +301,9 @@ Suite* test_suite()
 	testComparisons = tcase_create("Comparisons");
 	tcase_add_test(testComparisons,bigint_compare);
 
+	suite_add_tcase(suite,testInit);
 	suite_add_tcase(suite,testComparisons);
 	suite_add_tcase(suite,testCore);
 
 	return suite;
 }
-

@@ -84,6 +84,34 @@ static TR_Number* _performArithmetic(TR_Rational* (*rationalFunc)(TR_Rational*,T
 }
 
 
+char* TR_Number_toString(TR_Number* number)
+{
+  if (number->type == BigInt)
+  {
+    return TR_BigInt_toString(number->value.integer);
+  } else if (number->type == Rational) {
+    return TR_Rational_toString(number->value.rational);
+  }
+
+  return NULL;
+}
+
+TR_Number* TR_Number_fromString(TR_Environment* env, const char* input)
+{
+  TR_Number* number = TR_Number_alloc(env);
+  if (strchr(input,'/'))
+  {
+      number->value.rational = TR_Rational_fromString(env, input);
+      number->type = Rational;
+      _downconvert(number);
+      return number;
+  }
+
+  number->type = BigInt;
+  number->value.integer = TR_BigInt_fromString(env,input);
+  return number;
+}
+
 TR_Number* TR_Number_fromRational(TR_Rational *toWrap)
 {
   TR_Number *result = TR_Number_alloc(toWrap->environment);
@@ -106,7 +134,7 @@ TR_Number* TR_Number_copy(TR_Number *toCopy)
   if (toCopy->type == Rational)
   {
     result->type = Rational;
-    result->value.integer = TR_Rational_copy(toCopy->value.rational);
+    result->value.rational = TR_Rational_copy(toCopy->value.rational);
   } else if (toCopy->type == BigInt) {
     result->type = BigInt;
     result->value.integer = TR_BigInt_copy(toCopy->value.integer);
@@ -142,7 +170,13 @@ TR_Number* TR_Number_subtract(TR_Number* operand1, TR_Number* operand2)
 
 TR_Number* TR_Number_divide(TR_Number* operand1, TR_Number* operand2)
 {
-  return _performArithmetic(TR_Rational_divide,TR_BigInt_divide, operand1, operand2);
+  /* You say potato, I say tomato... */
+  TR_Number* result;
+  _upconvert_pair(operand1,operand2);
+  result->type = Rational;
+  result->value.rational = TR_Rational_divide(operand1->value.rational, operand2->value.rational);
+  _downconvert(result);
+  return result;
 }
 
 TR_Number* TR_Number_absolute(TR_Number* operand)

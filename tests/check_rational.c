@@ -55,7 +55,6 @@ START_TEST (rational_subtract)
 	TR_Environment *env = TR_Environment_alloc();
 	TR_Rational* num1 = TR_Rational_fromString(env,POSITIVE_CHECK_NUMBER);
         TR_Rational* num2 = TR_Rational_fromString(env,POSITIVE_CHECK_NUMBER2);
-	fprintf(stderr,"Checking it out...\n");
 	TR_Rational* num3 = TR_Rational_subtract(num1,num2);
 	ck_assert_str_eq(TR_Rational_toString(num3),"1/4");
 
@@ -86,20 +85,21 @@ END_TEST
 Suite* test_suite()
 {
 	Suite *suite;
-	TCase *testInit;
+	TCase *testInit,*testOperations;
 
 	suite = suite_create("Rational");
 	testInit = tcase_create("Init");
-
-
 	tcase_add_test(testInit,rational_input_output);
-	tcase_add_test(testInit,rational_subtract);
-	tcase_add_test(testInit,rational_add);
-	tcase_add_test(testInit,rational_multiply);
-	tcase_add_test(testInit,rational_divide);
 	tcase_add_test(testInit,rational_copy);
 
+	testOperations = tcase_create("Operations");
+	tcase_add_test(testOperations,rational_subtract);
+	tcase_add_test(testOperations,rational_add);
+	tcase_add_test(testOperations,rational_multiply);
+	tcase_add_test(testOperations,rational_divide);
+
 	suite_add_tcase(suite,testInit);
+	suite_add_tcase(suite,testOperations);
 
 	return suite;
 }

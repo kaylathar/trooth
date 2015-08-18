@@ -85,8 +85,10 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-TESTS = check_bigint$(EXEEXT) check_rational$(EXEEXT)
-check_PROGRAMS = check_bigint$(EXEEXT) check_rational$(EXEEXT)
+TESTS = check_bigint$(EXEEXT) check_rational$(EXEEXT) \
+	check_number$(EXEEXT)
+check_PROGRAMS = check_bigint$(EXEEXT) check_rational$(EXEEXT) \
+	check_number$(EXEEXT)
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -101,6 +103,12 @@ am_check_bigint_OBJECTS = check_bigint-check_trooth.$(OBJEXT) \
 check_bigint_OBJECTS = $(am_check_bigint_OBJECTS)
 check_bigint_DEPENDENCIES = $(top_builddir)/src/libtrooth.a
 check_bigint_LINK = $(CCLD) $(check_bigint_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_check_number_OBJECTS = check_number-check_trooth.$(OBJEXT) \
+	check_number-check_number.$(OBJEXT)
+check_number_OBJECTS = $(am_check_number_OBJECTS)
+check_number_DEPENDENCIES = $(top_builddir)/src/libtrooth.a
+check_number_LINK = $(CCLD) $(check_number_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_check_rational_OBJECTS = check_rational-check_trooth.$(OBJEXT) \
 	check_rational-check_rational.$(OBJEXT)
@@ -140,8 +148,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(check_bigint_SOURCES) $(check_rational_SOURCES)
-DIST_SOURCES = $(check_bigint_SOURCES) $(check_rational_SOURCES)
+SOURCES = $(check_bigint_SOURCES) $(check_number_SOURCES) \
+	$(check_rational_SOURCES)
+DIST_SOURCES = $(check_bigint_SOURCES) $(check_number_SOURCES) \
+	$(check_rational_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -470,6 +480,9 @@ check_bigint_LDADD = $(top_builddir)/src/libtrooth.a @CHECK_LIBS@
 check_rational_SOURCES = check_trooth.c check_rational.c
 check_rational_CFLAGS = @CHECK_CFLAGS@ -I$(top_builddir)/include/
 check_rational_LDADD = $(top_builddir)/src/libtrooth.a @CHECK_LIBS@
+check_number_SOURCES = check_trooth.c check_number.c
+check_number_CFLAGS = @CHECK_CFLAGS@ -I$(top_builddir)/include/
+check_number_LDADD = $(top_builddir)/src/libtrooth.a @CHECK_LIBS@
 all: all-am
 
 .SUFFIXES:
@@ -511,6 +524,10 @@ check_bigint$(EXEEXT): $(check_bigint_OBJECTS) $(check_bigint_DEPENDENCIES) $(EX
 	@rm -f check_bigint$(EXEEXT)
 	$(AM_V_CCLD)$(check_bigint_LINK) $(check_bigint_OBJECTS) $(check_bigint_LDADD) $(LIBS)
 
+check_number$(EXEEXT): $(check_number_OBJECTS) $(check_number_DEPENDENCIES) $(EXTRA_check_number_DEPENDENCIES) 
+	@rm -f check_number$(EXEEXT)
+	$(AM_V_CCLD)$(check_number_LINK) $(check_number_OBJECTS) $(check_number_LDADD) $(LIBS)
+
 check_rational$(EXEEXT): $(check_rational_OBJECTS) $(check_rational_DEPENDENCIES) $(EXTRA_check_rational_DEPENDENCIES) 
 	@rm -f check_rational$(EXEEXT)
 	$(AM_V_CCLD)$(check_rational_LINK) $(check_rational_OBJECTS) $(check_rational_LDADD) $(LIBS)
@@ -523,6 +540,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_bigint-check_bigint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_bigint-check_trooth.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_number-check_number.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_number-check_trooth.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_rational-check_rational.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_rational-check_trooth.Po@am__quote@
 
@@ -567,6 +586,34 @@ check_bigint-check_bigint.obj: check_bigint.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='check_bigint.c' object='check_bigint-check_bigint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_bigint_CFLAGS) $(CFLAGS) -c -o check_bigint-check_bigint.obj `if test -f 'check_bigint.c'; then $(CYGPATH_W) 'check_bigint.c'; else $(CYGPATH_W) '$(srcdir)/check_bigint.c'; fi`
+
+check_number-check_trooth.o: check_trooth.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_number_CFLAGS) $(CFLAGS) -MT check_number-check_trooth.o -MD -MP -MF $(DEPDIR)/check_number-check_trooth.Tpo -c -o check_number-check_trooth.o `test -f 'check_trooth.c' || echo '$(srcdir)/'`check_trooth.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/check_number-check_trooth.Tpo $(DEPDIR)/check_number-check_trooth.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='check_trooth.c' object='check_number-check_trooth.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_number_CFLAGS) $(CFLAGS) -c -o check_number-check_trooth.o `test -f 'check_trooth.c' || echo '$(srcdir)/'`check_trooth.c
+
+check_number-check_trooth.obj: check_trooth.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_number_CFLAGS) $(CFLAGS) -MT check_number-check_trooth.obj -MD -MP -MF $(DEPDIR)/check_number-check_trooth.Tpo -c -o check_number-check_trooth.obj `if test -f 'check_trooth.c'; then $(CYGPATH_W) 'check_trooth.c'; else $(CYGPATH_W) '$(srcdir)/check_trooth.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/check_number-check_trooth.Tpo $(DEPDIR)/check_number-check_trooth.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='check_trooth.c' object='check_number-check_trooth.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_number_CFLAGS) $(CFLAGS) -c -o check_number-check_trooth.obj `if test -f 'check_trooth.c'; then $(CYGPATH_W) 'check_trooth.c'; else $(CYGPATH_W) '$(srcdir)/check_trooth.c'; fi`
+
+check_number-check_number.o: check_number.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_number_CFLAGS) $(CFLAGS) -MT check_number-check_number.o -MD -MP -MF $(DEPDIR)/check_number-check_number.Tpo -c -o check_number-check_number.o `test -f 'check_number.c' || echo '$(srcdir)/'`check_number.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/check_number-check_number.Tpo $(DEPDIR)/check_number-check_number.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='check_number.c' object='check_number-check_number.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_number_CFLAGS) $(CFLAGS) -c -o check_number-check_number.o `test -f 'check_number.c' || echo '$(srcdir)/'`check_number.c
+
+check_number-check_number.obj: check_number.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_number_CFLAGS) $(CFLAGS) -MT check_number-check_number.obj -MD -MP -MF $(DEPDIR)/check_number-check_number.Tpo -c -o check_number-check_number.obj `if test -f 'check_number.c'; then $(CYGPATH_W) 'check_number.c'; else $(CYGPATH_W) '$(srcdir)/check_number.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/check_number-check_number.Tpo $(DEPDIR)/check_number-check_number.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='check_number.c' object='check_number-check_number.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_number_CFLAGS) $(CFLAGS) -c -o check_number-check_number.obj `if test -f 'check_number.c'; then $(CYGPATH_W) 'check_number.c'; else $(CYGPATH_W) '$(srcdir)/check_number.c'; fi`
 
 check_rational-check_trooth.o: check_trooth.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_rational_CFLAGS) $(CFLAGS) -MT check_rational-check_trooth.o -MD -MP -MF $(DEPDIR)/check_rational-check_trooth.Tpo -c -o check_rational-check_trooth.o `test -f 'check_trooth.c' || echo '$(srcdir)/'`check_trooth.c
@@ -799,6 +846,13 @@ check_bigint.log: check_bigint$(EXEEXT)
 check_rational.log: check_rational$(EXEEXT)
 	@p='check_rational$(EXEEXT)'; \
 	b='check_rational'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+check_number.log: check_number$(EXEEXT)
+	@p='check_number$(EXEEXT)'; \
+	b='check_number'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

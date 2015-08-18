@@ -11,6 +11,8 @@ TR_Number* TR_Number_fromRational(TR_Rational *toWrap);
 TR_Number* TR_Number_fromBigInt(TR_BigInt *toWrap);
 TR_Number* TR_Number_copy(TR_Number *toCopy);
 void TR_Number_free(TR_Number *toFree);
+char* TR_Number_toString(TR_Number* number);
+TR_Number* TR_Number_fromString(TR_Environment* env, const char* input);
 
 TR_Number* TR_Number_add(TR_Number* operand1, TR_Number* operand2);
 TR_Number* TR_Number_multiply(TR_Number* operand1, TR_Number* operand2);
