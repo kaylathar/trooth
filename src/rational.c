@@ -129,6 +129,20 @@ TR_Rational* TR_Rational_absolute(TR_Rational* operand) {
 	return retVal;
 }
 
+int TR_Rational_compare(TR_Rational* op1, TR_Rational* op2)
+{
+	int result;
+	TR_BigInt* num1 = TR_BigInt_multiply(op1->numerator,op2->denominator);
+	TR_BigInt* num2 = TR_BigInt_multiply(op2->numerator,op1->denominator);
+
+	result = TR_BigInt_compare(num1,num2);
+
+	TR_BigInt_free(num1);
+	TR_BigInt_free(num2);
+
+	return result;
+}
+
 TR_Rational* _canonicalize(TR_Rational* operand)
 {
 	char negative = operand->numerator->negative ^ operand->denominator->negative;
