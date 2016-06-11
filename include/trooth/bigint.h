@@ -91,6 +91,13 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2);
 TR_BigInt* TR_BigInt_multiply(TR_BigInt *operand1, TR_BigInt *operand2);
 
 /**
+ * Exponentiate a big int by another big int
+ * Only supports positive exponents - undefined results for negative
+ * @return Result of operand1 raised to exponent operand2
+ */
+TR_BigInt* TR_BigInt_exponentiate(TR_BigInt *operand1, TR_BigInt *operand2);
+
+/**
  * Divides operand1 by operand2 and returns the result
  * @return Result of dividing operand1 by operand2
  * */

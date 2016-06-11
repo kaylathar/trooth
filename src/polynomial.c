@@ -10,16 +10,23 @@
 
 struct TR_PolynomialTerm
 {
-  TR_Number* number;
-  int degree; /* This means we do not support arbitrarily high degree polynomials, we can change this later */
+  	TR_Number* number;
+  	int degree; /* This means we do not support arbitrarily high degree polynomials, we can change this later */
 };
 typedef struct TR_PolynomialTerm TR_PolynomialTerm;
 
+struct TR_PolynomialNode
+{
+  	TR_PolynomialTerm* term;
+  	struct TR_PolynomialNode* next;
+};
+typedef struct TR_PolynomialNode TR_PolynomialNode;
+
 struct TR_Polynomial
 {
-  int numTerms;
+	int numTerms;
 	TR_Environment* environment;
-  TR_PolynomialTerm* terms;
+ 	TR_PolynomialTerm* terms;
 };
 
 TR_Polynomial* TR_Polynomial_alloc(TR_Environment* env)
@@ -27,15 +34,15 @@ TR_Polynomial* TR_Polynomial_alloc(TR_Environment* env)
 	TR_Polynomial* retVal =  env->allocator(sizeof(TR_Polynomial));
 	retVal->environment = env;
 	retVal->terms = NULL;
-  retVal->numTerms = 0;
+  	retVal->numTerms = 0;
 	return retVal;
 }
 
 TR_Polynomial* TR_Polynomial_copy(TR_Polynomial *toCopy) {
 	TR_Polynomial* retVal = TR_Polynomial_alloc(toCopy->environment);
-  retVal->terms = malloc(sizeof(TR_PolynomialTerm) * toCopy->numTerms);
-  memcpy(retVal->terms,toCopy->terms,sizeof(TR_PolynomialTerm) * toCopy->numTerms);
-  retVal->numTerms = toCopy->numTerms;
+  	retVal->terms = malloc(sizeof(TR_PolynomialTerm) * toCopy->numTerms);
+  	memcpy(retVal->terms,toCopy->terms,sizeof(TR_PolynomialTerm) * toCopy->numTerms);
+  	retVal->numTerms = toCopy->numTerms;
 	return retVal;
 }
 

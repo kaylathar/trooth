@@ -553,6 +553,33 @@ TR_BigInt* TR_BigInt_multiply(TR_BigInt* operand1, TR_BigInt* operand2)
 	return _multiply_naive(operand1,operand2);
 }
 
+TR_BigInt* TR_BigInt_exponentiate(TR_BigInt *operand1, TR_BigInt *operand2)
+{
+	TR_BigInt *counter = TR_BigInt_copy(operand2);
+	TR_BigInt *tmp;
+	TR_BigInt *zero = TR_BigInt_fromString(operand1->environment, "0");
+	TR_BigInt *result = TR_BigInt_fromString(operand1->environment, "1");
+	TR_BigInt *one = TR_BigInt_fromString(operand1->environment, "1");
+
+	// Naive solution - move to recursive divide and conquer later
+	while (TR_BigInt_compare(counter,zero) > 0)
+	{
+
+		tmp = TR_BigInt_multiply(result, operand1);
+		TR_BigInt_free(result);
+		result = tmp;
+
+		tmp = TR_BigInt_subtract(counter, one);
+		TR_BigInt_free(counter);
+		counter = tmp;
+	}
+
+	TR_BigInt_free(one);
+	TR_BigInt_free(zero);
+	TR_BigInt_free(counter);
+	return result;
+}
+
 TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* operand2)
 {
 	/* Naive division algorithm - very slow
