@@ -1,0 +1,13 @@
+Makefile
+*/Makefile
+autom4te.cache/*
+config.*
+*/.deps/*
+*.o
+*.a
+tests/*.log
+tests/*.trs
+tests/check_bigint
+tests/check_rational
+.DS_Store
+README
