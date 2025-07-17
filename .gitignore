@@ -9,5 +9,6 @@ tests/*.log
 tests/*.trs
 tests/check_bigint
 tests/check_rational
+tests/check_number
 .DS_Store
 README
