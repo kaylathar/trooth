@@ -25,6 +25,9 @@ START_TEST (rational_input_output)
 
 	TR_Rational_free(num2);
 	TR_Rational_free(num3);
+	TR_Rational_free(num4);
+	TR_Rational_free(num5);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -36,6 +39,9 @@ START_TEST (rational_copy)
 	ck_assert_str_eq(TR_Rational_toString(num1),TR_Rational_toString(num2));
 	ck_assert(num1 != num2);
 
+	TR_Rational_free(num1);
+	TR_Rational_free(num2);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -46,6 +52,11 @@ START_TEST (rational_add)
         TR_Rational* num2 = TR_Rational_fromString(env,POSITIVE_CHECK_NUMBER2);
 	TR_Rational* num3 = TR_Rational_add(num1,num2);
 	ck_assert_str_eq(TR_Rational_toString(num3),"3/4");
+
+	TR_Rational_free(num1);
+	TR_Rational_free(num2);
+	TR_Rational_free(num3);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -58,6 +69,10 @@ START_TEST (rational_subtract)
 	TR_Rational* num3 = TR_Rational_subtract(num1,num2);
 	ck_assert_str_eq(TR_Rational_toString(num3),"1/4");
 
+	TR_Rational_free(num1);
+	TR_Rational_free(num2);
+	TR_Rational_free(num3);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -68,6 +83,11 @@ START_TEST (rational_multiply)
         TR_Rational* num2 = TR_Rational_fromString(env,POSITIVE_CHECK_NUMBER2);
         TR_Rational* num3 = TR_Rational_multiply(num1,num2);
         ck_assert_str_eq(TR_Rational_toString(num3),"1/8");
+
+        TR_Rational_free(num1);
+        TR_Rational_free(num2);
+        TR_Rational_free(num3);
+        TR_Environment_free(env);
 }
 END_TEST
 
@@ -78,6 +98,11 @@ START_TEST (rational_divide)
         TR_Rational* num2 = TR_Rational_fromString(env,POSITIVE_CHECK_NUMBER3);
         TR_Rational* num3 = TR_Rational_divide(num1,num2);
         ck_assert_str_eq(TR_Rational_toString(num3),"1/8");
+
+        TR_Rational_free(num1);
+        TR_Rational_free(num2);
+        TR_Rational_free(num3);
+        TR_Environment_free(env);
 }
 END_TEST
 

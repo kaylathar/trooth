@@ -25,6 +25,7 @@ START_TEST (bigint_init)
 	TR_BigInt_free(num2);
 	TR_BigInt_free(num3);
 	TR_BigInt_free(num4);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -46,6 +47,15 @@ START_TEST (bigint_gcd)
 	ck_assert_str_eq(TR_BigInt_toString(result3),"4");
 	ck_assert_str_eq(TR_BigInt_toString(result4),"1");
 
+	TR_BigInt_free(num1);
+	TR_BigInt_free(num2);
+	TR_BigInt_free(num3);
+	TR_BigInt_free(num4);
+	TR_BigInt_free(result1);
+	TR_BigInt_free(result2);
+	TR_BigInt_free(result3);
+	TR_BigInt_free(result4);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -196,6 +206,9 @@ START_TEST(bigint_exponentiate)
 	TR_BigInt *result1 = TR_BigInt_exponentiate(num2, num1);
 	ck_assert_str_eq(TR_BigInt_toString(result1), TWELVE_TO_ONETWENTYTHIRD);
 
+	TR_BigInt_free(num1);
+	TR_BigInt_free(num2);
+	TR_BigInt_free(result1);
 	TR_Environment_free(env);
 }
 END_TEST
@@ -286,6 +299,12 @@ START_TEST(bigint_divide)
 	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_quotient(result6)),"0");
 	ck_assert_str_eq(TR_BigInt_toString(TR_BigInt_DivisionResult_remainder(result6)),"12");
 
+	TR_BigInt_DivisionResult_free(result1);
+	TR_BigInt_DivisionResult_free(result2);
+	TR_BigInt_DivisionResult_free(result3);
+	TR_BigInt_DivisionResult_free(result4);
+	TR_BigInt_DivisionResult_free(result5);
+	TR_BigInt_DivisionResult_free(result6);
 	TR_BigInt_free(num1);
 	TR_BigInt_free(num2);
 	TR_BigInt_free(num3);

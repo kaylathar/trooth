@@ -29,6 +29,7 @@ START_TEST (number_input_output)
 	TR_Number_free(num3);
 	TR_Number_free(num4);
 	TR_Number_free(num5);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -40,6 +41,9 @@ START_TEST (number_copy)
 	ck_assert_str_eq(TR_Number_toString(num1),TR_Number_toString(num2));
 	ck_assert(num1 != num2);
 
+	TR_Number_free(num1);
+	TR_Number_free(num2);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -52,6 +56,12 @@ START_TEST (number_add)
 	TR_Number* num4 = TR_Number_add(num1,num1);
 	ck_assert_str_eq(TR_Number_toString(num3),"5/2");
 	ck_assert_str_eq(TR_Number_toString(num4),"1");
+
+	TR_Number_free(num1);
+	TR_Number_free(num2);
+	TR_Number_free(num3);
+	TR_Number_free(num4);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -64,6 +74,10 @@ START_TEST (number_subtract)
 	TR_Number* num3 = TR_Number_subtract(num1,num2);
 	ck_assert_str_eq(TR_Number_toString(num3),"1/4");
 
+	TR_Number_free(num1);
+	TR_Number_free(num2);
+	TR_Number_free(num3);
+	TR_Environment_free(env);
 }
 END_TEST
 
@@ -74,6 +88,11 @@ START_TEST (number_multiply)
   TR_Number* num2 = TR_Number_fromString(env,NUM5);
   TR_Number* num3 = TR_Number_multiply(num1,num2);
   ck_assert_str_eq(TR_Number_toString(num3),"1/8");
+
+  TR_Number_free(num1);
+  TR_Number_free(num2);
+  TR_Number_free(num3);
+  TR_Environment_free(env);
 }
 END_TEST
 
@@ -84,6 +103,11 @@ START_TEST (number_divide)
   TR_Number* num2 = TR_Number_fromString(env,NUM2);
   TR_Number* num3 = TR_Number_divide(num1,num2);
   ck_assert_str_eq(TR_Number_toString(num3),"1/4");
+
+  TR_Number_free(num1);
+  TR_Number_free(num2);
+  TR_Number_free(num3);
+  TR_Environment_free(env);
 }
 END_TEST
 
