@@ -20,6 +20,7 @@ static TR_Number* TR_Number_alloc(TR_Environment* environment)
 static void _upconvert(TR_Number* value)
 {
   TR_BigInt *one;
+  TR_BigInt *old_integer;
 
   if (value->type == Rational)
   {
@@ -27,10 +28,10 @@ static void _upconvert(TR_Number* value)
   }
 
   one = TR_BigInt_fromString(value->environment,"1");
+  old_integer = value->value.integer;
   value->type = Rational;
-  value->value.rational = TR_Rational_fromIntegers(value->value.integer,one);
-  TR_BigInt_free(value->value.integer);
-  value->value.integer = NULL;
+  value->value.rational = TR_Rational_fromIntegers(old_integer,one);
+  TR_BigInt_free(old_integer);
   TR_BigInt_free(one);
 }
 
@@ -43,6 +44,7 @@ static void _upconvert_pair(TR_Number* value1, TR_Number* value2)
 static void _downconvert(TR_Number* value)
 {
   TR_BigInt* denominator;
+  TR_Rational* old_rational;
   if (value->type == BigInt)
   {
     return;
@@ -51,14 +53,14 @@ static void _downconvert(TR_Number* value)
   denominator = TR_Rational_denominator(value->value.rational);
 
   /* When we have a one constant, switch to that */
-  if (strcmp(TR_BigInt_toString(denominator),"1"))
+  if (strcmp(TR_BigInt_toString(denominator),"1") != 0)
   {
     return;
   }
 
-  value->value.integer = TR_Rational_numerator(value->value.rational);
-  TR_Rational_free(value->value.rational);
-  TR_BigInt_free(denominator);
+  old_rational = value->value.rational;
+  value->value.integer = TR_BigInt_copy(TR_Rational_numerator(old_rational));
+  TR_Rational_free(old_rational);
   value->type = BigInt;
 }
 
@@ -75,6 +77,8 @@ static TR_Number* _performArithmetic(TR_Rational* (*rationalFunc)(TR_Rational*,T
     result->type = Rational;
     result->value.rational = rationalFunc(op1->value.rational,op2->value.rational);
     _downconvert(result);
+    TR_Number_free(op1);
+    TR_Number_free(op2);
     return result;
   }
 
@@ -146,9 +150,9 @@ void TR_Number_free(TR_Number *toFree)
 {
   if (toFree->type == Rational)
   {
-    toFree->environment->deallocator(toFree->value.rational);
+    TR_Rational_free(toFree->value.rational);
   } else if (toFree->type == BigInt) {
-    toFree->environment->deallocator(toFree->value.integer);
+    TR_BigInt_free(toFree->value.integer);
   }
   toFree->environment->deallocator(toFree);
 }
@@ -171,11 +175,19 @@ TR_Number* TR_Number_subtract(TR_Number* operand1, TR_Number* operand2)
 TR_Number* TR_Number_divide(TR_Number* operand1, TR_Number* operand2)
 {
   /* You say potato, I say tomato... */
-  TR_Number* result;
-  _upconvert_pair(operand1,operand2);
+  TR_Number *op1, *op2, *result;
+  
+  op1 = TR_Number_copy(operand1);
+  op2 = TR_Number_copy(operand2);
+  _upconvert_pair(op1, op2);
+  
+  result = TR_Number_alloc(operand1->environment);
   result->type = Rational;
-  result->value.rational = TR_Rational_divide(operand1->value.rational, operand2->value.rational);
+  result->value.rational = TR_Rational_divide(op1->value.rational, op2->value.rational);
   _downconvert(result);
+  
+  TR_Number_free(op1);
+  TR_Number_free(op2);
   return result;
 }
 

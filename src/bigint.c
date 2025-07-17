@@ -293,7 +293,7 @@ TR_BigInt* TR_BigInt_subtract(TR_BigInt *operand1, TR_BigInt *operand2)
 	result->bytes = operand1->environment->allocator(size);
 	memcpy(result->bytes,bytes+i,size);
 	result->size = size;
-	//operand1->environment->deallocator(bytes);
+	operand1->environment->deallocator(bytes);
 	return result;
 }
 
@@ -592,25 +592,49 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 
 	one = TR_BigInt_fromString(operand1->environment,"1");
 	zero = TR_BigInt_fromString(operand1->environment,"0");
-	quotient = zero;
+	
+	/* Check for division by zero */
+	if (TR_BigInt_compare(operand2, zero) == 0) {
+		TR_BigInt_free(one);
+		TR_BigInt_free(zero);
+		return NULL; /* Division by zero */
+	}
+	
+	quotient = TR_BigInt_copy(zero);
 	negative = operand1->negative ^ operand2->negative;
-	operand1 = TR_BigInt_copy(operand1);
-	operand2 = TR_BigInt_copy(operand2);
-	operand1->negative = 0;
-	operand2->negative = 0;
-	remainder = operand1;
-	diff = TR_BigInt_compare(remainder,operand2);
+	TR_BigInt* dividend = TR_BigInt_copy(operand1);
+	TR_BigInt* divisor = TR_BigInt_copy(operand2);
+	dividend->negative = 0;
+	divisor->negative = 0;
+	remainder = dividend;
+	
+	/* If dividend is smaller than divisor, quotient is 0 and remainder is dividend */
+	diff = TR_BigInt_compare(remainder,divisor);
+	if (diff == -1) {
+		quotient->negative = negative;
+		result = (operand1->environment->allocator(sizeof(TR_BigInt_DivisionResult)));
+		result->environment = operand1->environment;
+		_canonicalize(quotient);
+		result->quotient = quotient;
+		_canonicalize(remainder);
+		result->remainder = remainder;
+		TR_BigInt_free(one);
+		TR_BigInt_free(zero);
+		TR_BigInt_free(divisor);
+		return result;
+	}
+	
 	while (diff == 0 || diff == 1)
 	{
 		tmp = TR_BigInt_add(quotient,one);
 		TR_BigInt_free(quotient);
 		quotient = tmp;
 
-		tmp = TR_BigInt_subtract(remainder,operand2);
+		tmp = TR_BigInt_subtract(remainder,divisor);
 		TR_BigInt_free(remainder);
 		remainder = tmp;
 
-		diff = TR_BigInt_compare(remainder,operand2);
+		diff = TR_BigInt_compare(remainder,divisor);
 
 	}
 
@@ -623,35 +647,33 @@ TR_BigInt_DivisionResult* TR_BigInt_divide(TR_BigInt* operand1, TR_BigInt* opera
 	result->remainder = remainder;
 
 	TR_BigInt_free(one);
+	TR_BigInt_free(zero);
+	TR_BigInt_free(divisor);
 	return result;
 
 }
 
 TR_BigInt* TR_BigInt_gcd(TR_BigInt* op1, TR_BigInt* op2)
 {
-  TR_BigInt* num1,*num2;
+	TR_BigInt* num1, *num2, *temp;
 	TR_BigInt_DivisionResult* divisionResult;
-  TR_BigInt* zero = TR_BigInt_fromString(op1->environment,"0");
-
-	/* Ensure correct ordering */
-	if (TR_BigInt_compare(op1,op2) == 1)
-	{
+	TR_BigInt* zero = TR_BigInt_fromString(op1->environment,"0");
+	if (TR_BigInt_compare(op1,op2) == 1){
 		return TR_BigInt_gcd(op2,op1);
 	}
 	num1 = TR_BigInt_absolute(op1);
 	num2 = TR_BigInt_absolute(op2);
-	while (TR_BigInt_compare(num1,zero) == 1)
+	while (TR_BigInt_compare(num2,zero) != 0)
 	{
-		divisionResult = TR_BigInt_divide(num2,num1);
-		TR_BigInt_free(num2);
-		num2 = num1;
-		num1 = divisionResult->remainder;
-		TR_BigInt_free(divisionResult->quotient);
+		divisionResult = TR_BigInt_divide(num1,num2);
+		TR_BigInt_free(num1);
+		num1 = num2;
+		num2 = TR_BigInt_copy(divisionResult->remainder);
 		TR_BigInt_DivisionResult_free(divisionResult);
 	}
-	TR_BigInt_free(num1);
+	TR_BigInt_free(num2);
 	TR_BigInt_free(zero);
-	return num2;
+	return num1;
 }
 
 /***************************/
@@ -659,7 +681,9 @@ TR_BigInt* TR_BigInt_gcd(TR_BigInt* op1, TR_BigInt* op2)
 /***************************/
 void TR_BigInt_DivisionResult_free(TR_BigInt_DivisionResult* toFree)
 {
-		toFree->environment->deallocator(toFree);
+	TR_BigInt_free(toFree->quotient);
+	TR_BigInt_free(toFree->remainder);
+	toFree->environment->deallocator(toFree);
 }
 
 TR_BigInt* TR_BigInt_DivisionResult_remainder(TR_BigInt_DivisionResult* result)

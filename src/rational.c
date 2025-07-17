@@ -149,6 +149,9 @@ TR_Rational* _canonicalize(TR_Rational* operand)
 	TR_BigInt* gcd = TR_BigInt_gcd(operand->numerator,operand->denominator);
 	TR_BigInt_DivisionResult* num = TR_BigInt_divide(operand->numerator,gcd);
 	TR_BigInt_DivisionResult* den = TR_BigInt_divide(operand->denominator,gcd);
+
+	TR_BigInt_free(operand->numerator);
+	TR_BigInt_free(operand->denominator);
 	operand->numerator = TR_BigInt_copy(num->quotient);
 	operand->numerator->negative = negative;
 	operand->denominator = TR_BigInt_copy(den->quotient);
